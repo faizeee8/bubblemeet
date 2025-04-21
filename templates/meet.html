@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySphere Meeting Room</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #614385, #516395);
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-container {
+            width: 90%;
+            max-width: 800px;
+            background: black;
+            border-radius: 10px;
+            padding: 10px;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .username-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #ff5e62;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            flex: 1 1 120px;
+        }
+
+        .btn:hover {
+            background: #e14e53;
+        }
+
+        .leave-btn {
+            background: transparent;
+            border: 2px solid red;
+            color: red;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            flex: 1 1 120px;
+        }
+
+        .leave-btn:hover {
+            background: red;
+            color: white;
+        }
+
+        /* Chat Box - Responsive */
+        .chat-box {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 90%;
+            max-width: 250px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            height: 120px;
+            overflow-y: auto;
+            border-bottom: 1px solid #666;
+            padding-bottom: 5px;
+        }
+
+        .chat-messages div {
+            text-align: left;
+            margin: 5px 0;
+            padding: 5px;
+            background: #333;
+            border-radius: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 5px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: #ff5e62;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        /* Make sure everything fits on smaller screens */
+        @media (max-width: 600px) {
+            .video-container {
+                width: 95%;
+            }
+
+            .btn, .leave-btn {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+
+            .chat-box {
+                width: 85%;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <video id="videoElement" autoplay></video>
+        <div class="username-overlay" id="usernameOverlay"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="toggleMic()">🎤 Mic</button>
+        <button class="btn" onclick="toggleVideo()">📹 Video</button>
+        <button class="btn" id="shareScreenBtn" style="display: none;" onclick="toggleScreenShare()">🖥️ Share</button>
+        <button class="leave-btn" onclick="leaveMeeting()">🚪 Leave</button>
+    </div>
+
+    <!-- Chat Box -->
+    <div class="chat-box">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById("videoElement");
+        let usernameOverlay = document.getElementById("usernameOverlay");
+        let shareScreenBtn = document.getElementById("shareScreenBtn");
+        let chatMessages = document.getElementById("chatMessages");
+        let chatInput = document.getElementById("chatInput");
+        let userName = "";
+
+        function askForName() {
+            userName = prompt("Give yourself a name:");
+            while (!userName) {
+                alert("Please enter a name.");
+                userName = prompt("Give yourself a name:");
+            }
+            usernameOverlay.innerText = userName;
+
+            if (!localStorage.getItem("host")) {
+                localStorage.setItem("host", userName);
+                shareScreenBtn.style.display = "inline-block";
+            }
+        }
+
+        askForName();
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.dataset.stream = stream;
+            })
+            .catch(function(error) {
+                console.log("Error accessing camera/mic:", error);
+                alert("Error accessing camera/mic. Please check permissions.");
+            });
+
+        function toggleMic() {
+            let stream = video.dataset.stream;
+            if (stream) {
+                let audioTracks = stream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                    let enabled = audioTracks[0].enabled;
+                    audioTracks[0].enabled = !enabled;
+                }
+            }
+        }
+
+        function toggleVideo() {
+            let stream = video.dataset.stream;
+            if (stream) {
+                let videoTracks = stream.getVideoTracks();
+                if (videoTracks.length > 0) {
+                    let enabled = videoTracks[0].enabled;
+                    videoTracks[0].enabled = !enabled;
+                    video.style.display = enabled ? "none" : "block";
+                    usernameOverlay.style.display = enabled ? "block" : "none";
+                }
+            }
+        }
+
+        function leaveMeeting() {
+            localStorage.removeItem("host");
+            window.location.href = "index.html";
+        }
+
+        function sendMessage() {
+            let message = chatInput.value.trim();
+            if (message) {
+                let msgDiv = document.createElement("div");
+                msgDiv.innerText = `${userName}: ${message}`;
+                chatMessages.appendChild(msgDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatInput.value = "";
+            }
+        }
+
+        chatInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+    </script>
+
+</body>
+</html>
