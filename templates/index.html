@@ -1,320 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bubblemeet - Connect & Learn</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bubblemeet - Connect & Learn</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to right, #614385, #516395);
-            color: white;
-            text-align: center;
-            overflow: hidden;
-            position: relative;
-        }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #614385, #516395);
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
 
-        /* Bubble Background Animation */
-        .bubbles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-            top: 0;
-            left: 0;
-        }
+    body.dark-mode {
+      background: #121212;
+      color: #e0e0e0;
+    }
 
-        .bubble {
-            position: absolute;
-            bottom: -100px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: rise 15s infinite ease-in;
-        }
+    .dark-mode .rooms-container {
+      background: rgba(50, 50, 50, 0.9);
+      color: #fff;
+    }
 
-        .bubble:nth-child(1) {
-            width: 40px;
-            height: 40px;
-            left: 10%;
-            animation-duration: 8s;
-        }
+    .header, .hero, .rooms-container {
+      position: relative;
+      z-index: 1;
+    }
 
-        .bubble:nth-child(2) {
-            width: 20px;
-            height: 20px;
-            left: 20%;
-            animation-duration: 5s;
-            animation-delay: 1s;
-        }
+    .header {
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .bubble:nth-child(3) {
-            width: 50px;
-            height: 50px;
-            left: 35%;
-            animation-duration: 7s;
-            animation-delay: 2s;
-        }
+    .dark-toggle {
+      margin-right: 20px;
+      padding: 10px 20px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-        .bubble:nth-child(4) {
-            width: 80px;
-            height: 80px;
-            left: 50%;
-            animation-duration: 11s;
-            animation-delay: 0s;
-        }
+    .hero {
+      padding: 60px 20px;
+    }
 
-        .bubble:nth-child(5) {
-            width: 35px;
-            height: 35px;
-            left: 55%;
-            animation-duration: 6s;
-            animation-delay: 1s;
-        }
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
 
-        .bubble:nth-child(6) {
-            width: 45px;
-            height: 45px;
-            left: 65%;
-            animation-duration: 8s;
-            animation-delay: 3s;
-        }
+    .hero p {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
 
-        .bubble:nth-child(7) {
-            width: 25px;
-            height: 25px;
-            left: 75%;
-            animation-duration: 7s;
-            animation-delay: 2s;
-        }
+    .buttons {
+      margin-top: 20px;
+    }
 
-        .bubble:nth-child(8) {
-            width: 80px;
-            height: 80px;
-            left: 80%;
-            animation-duration: 6s;
-            animation-delay: 1s;
-        }
+    .buttons button {
+      background: #ff5e62;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px;
+      transition: 0.3s;
+    }
 
-        @keyframes rise {
-            0% {
-                bottom: -100px;
-                transform: translateX(0);
-            }
-            50% {
-                transform: translateX(100px);
-            }
-            100% {
-                bottom: 1080px;
-                transform: translateX(-200px);
-            }
-        }
+    .buttons button:hover {
+      background: #e14e53;
+    }
 
-        /* Existing Styles */
-        .header {
-            padding: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            position: relative;
-            z-index: 1;
-        }
-        .hero {
-            padding: 60px 20px;
-            position: relative;
-            z-index: 1;
-        }
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        .hero p {
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
-        .buttons {
-            margin-top: 20px;
-        }
-        .buttons button {
-            background: #ff5e62;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px;
-            transition: 0.3s;
-            position: relative;
-            z-index: 1;
-        }
-        .buttons button:hover {
-            background: #e14e53;
-        }
-        .rooms-container {
-            margin-top: 40px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            border-radius: 15px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            z-index: 1;
-        }
-        .room {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            cursor: pointer;
-        }
-        .room:last-child {
-            border-bottom: none;
-        }
-        .room a {
-            text-decoration: none;
-            color: #2575fc;
-            font-weight: bold;
-        }
+    .rooms-container {
+      margin-top: 40px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border-radius: 15px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-        /* Loading Animation */
-        .loading-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 100;
-        }
-        .loading-text {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .loader {
-            border: 6px solid rgba(255, 255, 255, 0.3);
-            border-top: 6px solid #ff5e62;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    .room {
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+    }
+
+    .room:last-child {
+      border-bottom: none;
+    }
+
+    .loading-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 999;
+    }
+
+    .loading-text {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .loader {
+      border: 6px solid rgba(255, 255, 255, 0.3);
+      border-top: 6px solid #ff5e62;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .bubbles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      animation: float 30s infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: translate(-50px, -100px) scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(30px, 60px) scale(1);
+        opacity: 0.8;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Bubble Background -->
-    <div class="bubbles">
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
+
+  <!-- Bubble Background -->
+  <div class="bubbles" id="bubbleContainer"></div>
+
+  <div class="header">
+    🎓 Bubblemeet - Your Virtual Study Hub
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+  </div>
+
+  <div class="hero">
+    <h1>Connect. Learn. Succeed.</h1>
+    <p>Join study groups, collaborate with friends, and enhance your learning experience.</p>
+    <div class="buttons">
+      <button onclick="createRoom()">➕ Create Study Room</button>
+      <button onclick="searchRoom()">🔍 Search Study Rooms</button>
     </div>
+  </div>
 
-    <div class="header">
-        🎓 Bubblemeet - Your Virtual Study Hub
+  <div class="rooms-container">
+    <h2>📌 Active Study Rooms</h2>
+    <div id="roomList">
+      <div class="room" id="Math Study Group" onclick="joinRoom('Math Study Group')">📖 Math Study Group</div>
+      <div class="room" id="Chemistry Revision Session" onclick="joinRoom('Chemistry Revision Session')">🧪 Chemistry Revision Session</div>
+      <div class="room" id="Coding Bootcamp Discussion" onclick="joinRoom('Coding Bootcamp Discussion')">💻 Coding Bootcamp Discussion</div>
     </div>
+  </div>
 
-    <div class="hero">
-        <h1>Connect. Learn. Succeed.</h1>
-        <p>Join study groups, collaborate with friends, and enhance your learning experience.</p>
-        <div class="buttons">
-            <button onclick="createRoom()">➕ Create Study Room</button>
-            <button onclick="searchRoom()">🔍 Search Study Rooms</button>
-        </div>
-    </div>
+  <div class="loading-container" id="loadingScreen">
+    <div class="loading-text">Joining Room...</div>
+    <div class="loader"></div>
+  </div>
 
-    <div class="rooms-container">
-        <h2>📌 Active Study Rooms</h2>
-        <div id="roomList">
-            <div class="room" onclick="joinRoom('Math Study Group')">📖 Math Study Group</div>
-            <div class="room" onclick="joinRoom('Chemistry Revision Session')">🧪 Chemistry Revision Session</div>
-            <div class="room" onclick="joinRoom('Coding Bootcamp Discussion')">💻 Coding Bootcamp Discussion</div>
-        </div>
-    </div>
+  <script>
+    const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
 
-    <!-- Loading Animation -->
-    <div class="loading-container" id="loadingScreen">
-        <div class="loading-text">Joining Room...</div>
-        <div class="loader"></div>
-    </div>
+    function getRandomEmoji() {
+      return studyEmojis[Math.floor(Math.random() * studyEmojis.length)];
+    }
 
-    <script>
-        // List of Random Emojis for Study Rooms
-        const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
+    function createRoom() {
+      let roomTitle = prompt("Enter a name for your study room:");
+      if (roomTitle) {
+        let randomEmoji = getRandomEmoji();
+        let roomList = document.getElementById("roomList");
+        let newRoom = document.createElement("div");
+        newRoom.classList.add("room");
+        newRoom.id = roomTitle;
+        newRoom.innerHTML = `${randomEmoji} ${roomTitle}`;
+        newRoom.onclick = function () {
+          joinRoom(roomTitle);
+        };
+        roomList.appendChild(newRoom);
+      }
+    }
 
-        function getRandomEmoji() {
-            return studyEmojis[Math.floor(Math.random() * studyEmojis.length)];
+    function searchRoom() {
+      let searchQuery = prompt("Enter study room name:")?.trim();
+      if (searchQuery) {
+        let roomElement = document.getElementById(searchQuery);
+        if (roomElement) {
+          roomElement.scrollIntoView({ behavior: "smooth", block: "center" });
+          roomElement.style.backgroundColor = "#ffd966";
+          setTimeout(() => {
+            roomElement.style.backgroundColor = "";
+          }, 1500);
+        } else {
+          alert("No study room found with that name.");
         }
+      }
+    }
 
-        function createRoom() {
-            let roomTitle = prompt("Enter a name for your study room:");
-            if (roomTitle) {
-                let randomEmoji = getRandomEmoji(); // Get a random emoji
-                let roomList = document.getElementById("roomList");
-                let newRoom = document.createElement("div");
-                newRoom.classList.add("room");
-                newRoom.innerHTML = `${randomEmoji} ${roomTitle}`;
-                newRoom.onclick = function () {
-                    joinRoom(roomTitle);
-                };
-                roomList.appendChild(newRoom);
-            }
-        }
+    function joinRoom(roomName) {
+      document.getElementById("loadingScreen").style.display = "flex";
+      setTimeout(() => {
+        window.location.href = `meet.html?room=${encodeURIComponent(roomName)}`;
+      }, 2000);
+    }
 
-        function searchRoom() {
-            let searchQuery = prompt("Enter study room name:");
-            if (searchQuery) {
-                alert("Feature coming soon! Stay tuned.");
-            }
-        }
+    // Generate bubbles
+    const bubbleContainer = document.getElementById("bubbleContainer");
+    for (let i = 0; i < 30; i++) {
+      const bubble = document.createElement("div");
+      const size = Math.random() * 40 + 10;
+      bubble.className = "bubble";
+      bubble.style.width = `${size}px`;
+      bubble.style.height = `${size}px`;
+      bubble.style.top = `${Math.random() * 100}%`;
+      bubble.style.left = `${Math.random() * 100}%`;
+      bubble.style.animationDuration = `${15 + Math.random() * 15}s`;
+      bubbleContainer.appendChild(bubble);
+    }
 
-        function joinRoom(roomName) {
-            document.getElementById("loadingScreen").style.display = "flex";
+    // Dark mode toggle
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", body.classList.contains("dark-mode"));
+    }
 
-            setTimeout(() => {
-                window.location.href = `meet.html?room=${encodeURIComponent(roomName)}`;
-            }, 2000);
-        }
+    // Set dark mode on load if saved
+    window.addEventListener("DOMContentLoaded", () => {
+      const isDarkMode = localStorage.getItem("darkMode") === "true";
+      if (isDarkMode) {
+        document.body.classList.add("dark-mode");
+      }
+    });
+  </script>
 
-        // Generate more bubbles dynamically
-        document.addEventListener('DOMContentLoaded', function() {
-            const bubblesContainer = document.querySelector('.bubbles');
-            for (let i = 0; i < 12; i++) {
-                const bubble = document.createElement('div');
-                bubble.classList.add('bubble');
-                
-                // Random properties
-                const size = Math.random() * 60 + 20;
-                const posX = Math.random() * 100;
-                const delay = Math.random() * 5;
-                const duration = Math.random() * 10 + 5;
-                
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                bubble.style.left = `${posX}%`;
-                bubble.style.animationDuration = `${duration}s`;
-                bubble.style.animationDelay = `${delay}s`;
-                bubble.style.opacity = Math.random() * 0.5 + 0.1;
-                
-                bubblesContainer.appendChild(bubble);
-            }
-        });
-    </script>
 </body>
 </html>
