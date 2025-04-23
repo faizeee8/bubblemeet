@@ -40,3 +40,8 @@ if __name__ == '__main__':
 @app.route('/meet.html')
 def meet():
     return render_template('meet.html')
+
+@app.route('/')
+def home():
+    session.clear()  # Clear session if needed
+    return render_template('index.html')
