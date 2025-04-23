@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room {{ room_id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Room {{ room_id }}</h1>
+        <p>This is the room where your study group will meet!</p>
+        <a href="{{ url_for('index') }}">Back to Home</a>
+    </header>
+
+    <section id="room-details">
+        <h2>Room Details</h2>
+        <p><strong>Room ID:</strong> {{ room_id }}</p>
+        <!-- Add other room details here (e.g., creator, topic, time, etc.) -->
+    </section>
+
+    <section id="participants">
+        <h3>Participants:</h3>
+        <!-- You can dynamically list participants here later with Flask or JavaScript -->
+        <ul>
+            <li>John Doe</li>
+            <li>Jane Smith</li>
+            <!-- Add more participants as needed -->
+        </ul>
+    </section>
+
+    <section id="join-room">
+        <h3>Join the Room</h3>
+        <button onclick="joinRoom()">Join Now</button>
+    </section>
+
+    <script>
+        // Example function for joining the room (you can modify this for your real functionality)
+        function joinRoom() {
+            // Logic to join the room (maybe a socket connection or a redirect to a meeting page)
+            alert("You have joined the room!");
+            // Optionally, redirect the user to the actual meeting page for this room
+            window.location.href = "/meet/{{ room_id }}";
+        }
+    </script>
+
+</body>
+</html>

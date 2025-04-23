@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bubblemeet - Connect & Learn</title>
+  <!-- Link to static CSS file -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
@@ -208,6 +210,9 @@
     <div class="loading-text">Joining Room...</div>
     <div class="loader"></div>
   </div>
+
+  <!-- Link to static JS file -->
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 
   <script>
     const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
