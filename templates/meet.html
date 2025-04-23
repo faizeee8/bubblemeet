@@ -162,6 +162,7 @@
     </style>
 </head>
 <body>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 
 <div class="toggle-container">
     <button class="toggle-switch" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
@@ -207,6 +208,22 @@
 
     applyDarkMode();
 
+    let roomName = "";
+
+if (window.location.search.includes("room=")) {
+    const urlParams = new URLSearchParams(window.location.search);
+    roomName = urlParams.get("room");
+} else {
+    // Try fallback from GitHub Pages-style routing
+    const pathParts = window.location.pathname.split("/");
+    const possibleRoom = pathParts[pathParts.length - 1].replace(".html", "");
+    if (possibleRoom && possibleRoom !== "meet") {
+        roomName = possibleRoom;
+    }
+}
+
+// Optional: you can log or use roomName if needed
+console.log("Room:", roomName);
     let video = document.getElementById("videoElement");
     let usernameOverlay = document.getElementById("usernameOverlay");
     let shareScreenBtn = document.getElementById("shareScreenBtn");
@@ -327,6 +344,7 @@
         }
     });
 </script>
+
 
 </body>
 </html>
