@@ -36,3 +36,7 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/meet.html')
+def meet():
+    return render_template('meet.html')
