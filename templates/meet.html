@@ -1,350 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudySphere Meeting Room</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudySphere Meeting Room</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to right, #614385, #516395);
-            color: white;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #614385, #516395);
+      color: white;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        .dark-mode {
-            background: #121212 !important;
-            color: white !important;
-        }
+    .dark-mode {
+      background: #121212 !important;
+      color: white !important;
+    }
 
-        .toggle-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
+    .toggle-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
 
-        .toggle-switch {
-            cursor: pointer;
-            padding: 10px 20px;
-            background-color: #ff5e62;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-        }
+    .toggle-switch {
+      cursor: pointer;
+      padding: 10px 20px;
+      background-color: #ff5e62;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+    }
 
-        .toggle-switch:hover {
-            background-color: #e14e53;
-        }
+    .toggle-switch:hover {
+      background-color: #e14e53;
+    }
 
-        .video-container {
-            width: 80%;
-            max-width: 800px;
-            background: black;
-            border-radius: 10px;
-            padding: 20px;
-            position: relative;
-        }
+    .video-container {
+      width: 80%;
+      max-width: 800px;
+      background: black;
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+      margin-bottom: 20px;
+    }
 
-        video {
-            width: 100%;
-            border-radius: 10px;
-        }
+    video {
+      width: 100%;
+      border-radius: 10px;
+    }
 
-        .username-overlay {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 18px;
-        }
+    .username-overlay {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 18px;
+    }
 
-        .controls {
-            margin-top: 20px;
-        }
+    .controls {
+      margin-top: 20px;
+    }
 
-        .btn {
-            background: #ff5e62;
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px;
-            transition: 0.3s;
-        }
+    .btn {
+      background: #ff5e62;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px;
+      transition: 0.3s;
+    }
 
-        .btn:hover {
-            background: #e14e53;
-        }
+    .btn:hover {
+      background: #e14e53;
+    }
 
-        .leave-btn {
-            background: transparent;
-            border: 3px solid red;
-            color: red;
-            padding: 15px 30px;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+    .btn.off {
+      background: #888;
+      color: white;
+    }
 
-        .leave-btn:hover {
-            background: red;
-            color: white;
-        }
+    .leave-btn {
+      background: transparent;
+      border: 3px solid red;
+      color: red;
+      padding: 15px 30px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-        .chat-box {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 250px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            padding: 10px;
-            color: white;
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-        }
+    .leave-btn:hover {
+      background: red;
+      color: white;
+    }
 
-        .chat-messages {
-            height: 150px;
-            overflow-y: auto;
-            border-bottom: 1px solid #666;
-            padding-bottom: 5px;
-        }
+    .chat-box {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 250px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 10px;
+      color: white;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
 
-        .chat-messages div {
-            text-align: left;
-            margin: 5px 0;
-            padding: 5px;
-            background: #333;
-            border-radius: 5px;
-        }
+    .chat-box.minimized {
+      height: 50px;
+      width: 250px;
+      overflow: hidden;
+      bottom: 20px;
+      right: 20px;
+    }
 
-        .chat-input {
-            display: flex;
-        }
+    .chat-messages {
+      height: 150px;
+      overflow-y: auto;
+      border-bottom: 1px solid #666;
+      padding-bottom: 5px;
+    }
 
-        .chat-input input {
-            flex: 1;
-            padding: 5px;
-            border: none;
-            border-radius: 5px;
-            outline: none;
-        }
+    .chat-messages div {
+      text-align: left;
+      margin: 5px 0;
+      padding: 5px;
+      background: #333;
+      border-radius: 5px;
+    }
 
-        .chat-input button {
-            background: #ff5e62;
-            color: white;
-            border: none;
-            padding: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 5px;
-        }
-    </style>
+    .chat-input {
+      display: flex;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 5px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .chat-input button {
+      background: #ff5e62;
+      color: white;
+      border: none;
+      padding: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    .minimize-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+      .video-container {
+        width: 95%;
+        padding: 10px;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .chat-box {
+        width: 80%;
+        bottom: 15px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 
 <div class="toggle-container">
-    <button class="toggle-switch" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
+  <button class="toggle-switch" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
 </div>
 
 <div class="video-container">
-    <video id="videoElement" autoplay></video>
-    <div class="username-overlay" id="usernameOverlay"></div>
+  <video id="videoElement" autoplay muted></video>
+  <div class="username-overlay" id="usernameOverlay"></div>
 </div>
 
 <div class="controls">
-    <button class="btn" onclick="toggleMic()">🎤 Toggle Mic</button>
-    <button class="btn" onclick="toggleVideo()">📹 Toggle Video</button>
-    <button class="btn" id="shareScreenBtn" style="display: none;" onclick="toggleScreenShare()">🖥️ Share Screen</button>
-    <button onclick="window.location.href='/'">Leave Meeting</button>
+  <button class="btn" id="micBtn" onclick="toggleMic()">🎤 Toggle Mic</button>
+  <button class="btn" id="videoBtn" onclick="toggleVideo()">📹 Toggle Video</button>
+  <button class="btn" id="shareScreenBtn" style="display: none;" onclick="toggleScreenShare()">🖥️ Share Screen</button>
+  <button class="leave-btn" onclick="window.location.href='/'">🚪 Leave Meeting</button>
 </div>
 
-<div class="chat-box">
-    <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input">
-        <input type="text" id="chatInput" placeholder="Type a message...">
-        <button onclick="sendMessage()">Send</button>
-    </div>
+<div class="chat-box" id="chatBox">
+  <button class="minimize-btn" onclick="toggleMinimize()">_</button>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input">
+    <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="handleEnter(event)">
+    <button onclick="sendMessage()">Send</button>
+  </div>
 </div>
 
 <script>
-    function applyDarkMode() {
-        if (localStorage.getItem("theme") === "dark") {
-            document.body.classList.add("dark-mode");
-        } else {
-            document.body.classList.remove("dark-mode");
-        }
+  function applyDarkMode() {
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
     }
+  }
 
-    function toggleDarkMode() {
-        if (document.body.classList.contains("dark-mode")) {
-            localStorage.setItem("theme", "light");
-        } else {
-            localStorage.setItem("theme", "dark");
-        }
-        applyDarkMode();
+  function toggleDarkMode() {
+    if (document.body.classList.contains("dark-mode")) {
+      localStorage.setItem("theme", "light");
+    } else {
+      localStorage.setItem("theme", "dark");
     }
-
     applyDarkMode();
+  }
 
-    let roomName = "";
+  applyDarkMode();
 
-if (window.location.search.includes("room=")) {
-    const urlParams = new URLSearchParams(window.location.search);
-    roomName = urlParams.get("room");
-} else {
-    // Try fallback from GitHub Pages-style routing
-    const pathParts = window.location.pathname.split("/");
-    const possibleRoom = pathParts[pathParts.length - 1].replace(".html", "");
-    if (possibleRoom && possibleRoom !== "meet") {
-        roomName = possibleRoom;
-    }
-}
+  let video = document.getElementById("videoElement");
+  let micBtn = document.getElementById("micBtn");
+  let videoBtn = document.getElementById("videoBtn");
+  let usernameOverlay = document.getElementById("usernameOverlay");
+  let shareScreenBtn = document.getElementById("shareScreenBtn");
+  let chatMessages = document.getElementById("chatMessages");
+  let chatInput = document.getElementById("chatInput");
+  let userName = "";
+  let localStream;
+  let screenStream = null;
 
-// Optional: you can log or use roomName if needed
-console.log("Room:", roomName);
-    let video = document.getElementById("videoElement");
-    let usernameOverlay = document.getElementById("usernameOverlay");
-    let shareScreenBtn = document.getElementById("shareScreenBtn");
-    let chatMessages = document.getElementById("chatMessages");
-    let chatInput = document.getElementById("chatInput");
-    let userName = "";
-    let screenStream = null;
-
-    function askForName() {
-        userName = prompt("Give yourself a name:");
-        while (!userName) {
-            alert("Please enter a name.");
-            userName = prompt("Give yourself a name:");
-        }
-        usernameOverlay.innerText = userName;
-
-        if (!localStorage.getItem("host")) {
-            localStorage.setItem("host", userName);
-            shareScreenBtn.style.display = "inline-block";
-        }
+  async function askForName() {
+    userName = prompt("Give yourself a name:");
+    if (!userName) {
+      window.location.href = "/";
+      return;
     }
 
+    usernameOverlay.innerText = userName;
+
+    if (!localStorage.getItem("host")) {
+      localStorage.setItem("host", userName);
+      shareScreenBtn.style.display = "inline-block";
+    }
+
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      video.srcObject = localStream;
+    } catch (err) {
+      console.error("Error accessing camera/mic:", err);
+      alert("Please allow camera and microphone access.");
+    }
+  }
+
+  window.onload = () => {
+    applyDarkMode();
     askForName();
+  };
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(function(stream) {
-            video.srcObject = stream;
-            video.dataset.stream = stream;
-        })
-        .catch(function(error) {
-            console.log("Error accessing camera/mic:", error);
-            alert("Error accessing camera/mic. Please check permissions.");
-        });
-
-    function toggleMic() {
-        let stream = video.dataset.stream;
-        if (stream) {
-            let audioTracks = stream.getAudioTracks();
-            if (audioTracks.length > 0) {
-                let enabled = audioTracks[0].enabled;
-                audioTracks[0].enabled = !enabled;
-            }
-        }
+  function sendMessage() {
+    let message = chatInput.value;
+    if (message) {
+      let messageDiv = document.createElement("div");
+      messageDiv.innerText = `${userName}: ${message}`;
+      chatMessages.appendChild(messageDiv);
+      chatInput.value = "";
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+  }
 
-    function toggleVideo() {
-        let stream = video.dataset.stream;
-        if (stream) {
-            let videoTracks = stream.getVideoTracks();
-            if (videoTracks.length > 0) {
-                let enabled = videoTracks[0].enabled;
-                videoTracks[0].enabled = !enabled;
-                video.style.display = enabled ? "none" : "block";
-                usernameOverlay.style.display = enabled ? "block" : "none";
-            }
-        }
+  function handleEnter(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendMessage();
     }
+  }
 
-    function toggleScreenShare() {
-        if (userName !== localStorage.getItem("host")) {
-            alert("Only the host can share their screen!");
-            return;
-        }
+  function toggleMinimize() {
+    let chatBox = document.getElementById("chatBox");
+    chatBox.classList.toggle("minimized");
+  }
 
-        if (!screenStream) {
-            navigator.mediaDevices.getDisplayMedia({ video: true })
-                .then(function(stream) {
-                    screenStream = stream;
-                    video.srcObject = stream;
+  async function startScreenShare() {
+    try {
+      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const screenTrack = screenStream.getVideoTracks()[0];
+      video.srcObject = screenStream;
 
-                    stream.getVideoTracks()[0].onended = function() {
-                        stopScreenShare();
-                    };
-                })
-                .catch(function(error) {
-                    console.log("Error accessing screen share:", error);
-                });
-        } else {
-            stopScreenShare();
-        }
+      screenTrack.onended = () => stopScreenShare();
+      shareScreenBtn.innerHTML = "🛑 Stop Screen Share";
+    } catch (e) {
+      console.error("Error sharing screen:", e);
     }
+  }
 
-    function stopScreenShare() {
-        if (screenStream) {
-            let tracks = screenStream.getTracks();
-            tracks.forEach(track => track.stop());
-            screenStream = null;
-
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function(stream) {
-                    video.srcObject = stream;
-                    video.dataset.stream = stream;
-                });
-        }
+  function stopScreenShare() {
+    if (screenStream) {
+      screenStream.getTracks().forEach((track) => track.stop());
+      screenStream = null;
+      shareScreenBtn.innerHTML = "🖥️ Share Screen";
+      video.srcObject = localStream;
     }
+  }
 
-    function leaveMeeting() {
-        if (userName === localStorage.getItem("host")) {
-            localStorage.removeItem("host");
-        }
-        window.location.href = "index.html";
+  function toggleScreenShare() {
+    if (screenStream) {
+      stopScreenShare();
+    } else {
+      startScreenShare();
     }
+  }
 
-    function sendMessage() {
-        let message = chatInput.value.trim();
-        if (message) {
-            let msgDiv = document.createElement("div");
-            msgDiv.innerText = `${userName}: ${message}`;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            chatInput.value = "";
-        }
+  function toggleMic() {
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      micBtn.innerText = audioTrack.enabled ? "🎤 Toggle Mic" : "🔇 Mic Off";
+      micBtn.classList.toggle("off", !audioTrack.enabled);
     }
+  }
 
-    chatInput.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            sendMessage();
-        }
-    });
+  function toggleVideo() {
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      videoBtn.innerText = videoTrack.enabled ? "📹 Toggle Video" : "📷 Video Off";
+      videoBtn.classList.toggle("off", !videoTrack.enabled);
+    }
+  }
 </script>
-
 
 </body>
 </html>

@@ -1,7 +1,16 @@
 {
-    "hosting": {
-      "public": "templates",  
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
-    }
+  "hosting": {
+    "public": "templates",  // Serve HTML files from 'templates'
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "app"  // This rewrites all URLs to be handled by your Flask app
+      }
+    ]
   }
-  
+}

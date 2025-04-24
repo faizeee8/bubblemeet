@@ -180,6 +180,62 @@
 </head>
 <body>
 
+  <!-- Firebase Configuration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyDj-TAPE3f-35Q73Voe067Zxo73x1e4_eA",
+      authDomain: "bubblemeet-e6d83.firebaseapp.com",
+      projectId: "bubblemeet-e6d83",
+      storageBucket: "bubblemeet-e6d83.appspot.com",
+      messagingSenderId: "28744432918",
+      appId: "1:28744432918:web:5c4d58acb77cb5348a2437",
+      measurementId: "G-EJB8RD6HTL"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+  </script>
+
+<script type="module"> 
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDj-TAPE3f-35Q73Voe067Zxo73x1e4_eA",
+    authDomain: "bubblemeet-e6d83.firebaseapp.com",
+    projectId: "bubblemeet-e6d83",
+    storageBucket: "bubblemeet-e6d83.appspot.com",
+    messagingSenderId: "28744432918",
+    appId: "1:28744432918:web:5c4d58acb77cb5348a2437",
+    measurementId: "G-EJB8RD6HTL"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Here is the function to save the room
+  async function createRoom() {
+    const roomName = "room-" + Math.floor(Math.random() * 1000000);
+
+    try {
+      await setDoc(doc(db, "rooms", roomName), {
+        createdAt: new Date().toISOString()
+      });
+      console.log("Room saved to Firestore:", roomName);
+      window.location.href = `/meet/${roomName}`;
+    } catch (e) {
+      console.error("Error saving room to Firestore:", e);
+    }
+  }
+
+  // Button event listener to trigger room creation
+  document.getElementById("createBtn").addEventListener("click", createRoom);
+</script>
+
+
   <!-- Bubble Background -->
   <div class="bubbles" id="bubbleContainer"></div>
 
