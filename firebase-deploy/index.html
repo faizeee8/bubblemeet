@@ -176,6 +176,66 @@
         opacity: 0.8;
       }
     }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .buttons button {
+        width: 100%;
+        max-width: 300px;
+        font-size: 16px;
+      }
+
+      .rooms-container {
+        padding: 15px;
+        width: 90%;
+        font-size: 16px;
+      }
+
+      .room {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 40px 15px;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+      }
+
+      .hero p {
+        font-size: 14px;
+      }
+
+      .buttons button {
+        padding: 12px 20px;
+        font-size: 15px;
+      }
+
+      .header {
+        font-size: 20px;
+      }
+
+      .dark-toggle {
+        font-size: 12px;
+        padding: 8px 16px;
+      }
+    }
   </style>
 </head>
 <body>
