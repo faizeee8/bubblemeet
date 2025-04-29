@@ -231,6 +231,10 @@
 </head>
 <body>
 
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  
+
   <!-- Firebase Configuration (Single Instance) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
@@ -378,7 +382,19 @@
         document.body.classList.add("dark-mode");
       }
     });
+
+
+    
   </script>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io(); // Connect to the server
+  </script>
+
+
+
 
 </body>
 </html>

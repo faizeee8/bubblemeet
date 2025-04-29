@@ -231,6 +231,10 @@
 </head>
 <body>
 
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  
+
 <div class="toggle-container">
   <button class="toggle-switch" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
   <button class="toggle-switch" onclick="toggleFullscreen()">🖥️ Fullscreen</button>
@@ -401,6 +405,13 @@
     }
   }
 </script>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io(); // Connect to the server
+</script>
+
 
 </body>
 </html>
