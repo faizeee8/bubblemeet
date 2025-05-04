@@ -408,9 +408,84 @@
 
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+
 <script>
-  const socket = io(); // Connect to the server
+  const ROOM_NAME = "{{ room_name }}"; // Jinja will replace this
+  const socket = io();
+
+  const peer = new Peer(undefined, {
+    host: '/',
+    port: location.port || 443,
+    path: '/peerjs'
+  });
+
+  const peers = {};
+  const videoGrid = document.querySelector('.video-container');
+
+  peer.on('open', (id) => {
+    socket.emit('join-room', ROOM_NAME, id, userName);
+  });
+
+  socket.on('user-connected', (userId, name) => {
+    connectToNewUser(userId, localStream, name);
+  });
+
+  function connectToNewUser(userId, stream, name) {
+    const call = peer.call(userId, stream);
+    const video = document.createElement('video');
+    video.playsInline = true;
+
+    call.on('stream', (remoteStream) => {
+      addVideoStream(video, remoteStream, name);
+    });
+
+    call.on('close', () => {
+      video.remove();
+    });
+
+    peers[userId] = call;
+  }
+
+  peer.on('call', (call) => {
+    call.answer(localStream);
+    const video = document.createElement('video');
+    video.playsInline = true;
+
+    call.on('stream', (remoteStream) => {
+      addVideoStream(video, remoteStream, "Peer");
+    });
+
+    call.on('close', () => {
+      video.remove();
+    });
+
+    peers[call.peer] = call;
+  });
+
+  function addVideoStream(video, stream, label) {
+    video.srcObject = stream;
+    video.addEventListener('loadedmetadata', () => {
+      video.play();
+    });
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'relative';
+    wrapper.style.marginTop = '10px';
+    wrapper.appendChild(video);
+
+    const overlay = document.createElement('div');
+    overlay.classList.add('username-overlay');
+    overlay.textContent = label;
+    wrapper.appendChild(overlay);
+
+    videoGrid.appendChild(wrapper);
+  }
+
+  socket.on('user-disconnected', userId => {
+    if (peers[userId]) peers[userId].close();
+  });
 </script>
+
 
 
 </body>
