@@ -104,3 +104,7 @@ def handle_leave_room(data):
 # ✅ Run with SocketIO
 if __name__ == '__main__':
     socketio.run(app, debug=True,port=5001)
+
+@app.route('/meet/<room_id>')
+def meet(room_id):
+    return render_template('room.html', room_id=room_id)

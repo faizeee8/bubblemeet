@@ -299,7 +299,7 @@
   function joinRoom(roomName) {
     document.getElementById("loadingScreen").style.display = "flex";
     setTimeout(() => {
-      window.location.href = `meet.html#${encodeURIComponent(roomName)}`;
+      window.location.href = `/meet/${encodeURIComponent(roomName)}`;
     }, 2000);
   }
 
