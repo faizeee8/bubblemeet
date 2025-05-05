@@ -218,23 +218,27 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  async function createRoomFirestore() {
-    const roomName = "room-" + Math.floor(Math.random() * 1000000);
+  async function createRoom() {
     try {
-      await setDoc(doc(db, "rooms", roomName), {
-        createdAt: new Date().toISOString()
+      const response = await fetch('/api/create_room', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-      console.log("Room saved to Firestore:", roomName);
-      window.location.href = `/meet/${encodeURIComponent(roomName)}`;
-    } catch (e) {
-      console.error("Error saving room to Firestore:", e);
+      const data = await response.json();
+      const roomId = data.room_id;
+      window.location.href = `/meet/${roomId}`;
+    } catch (error) {
+      console.error('Error creating room:', error);
     }
   }
 
   const createBtn = document.getElementById("createBtn");
   if (createBtn) {
-    createBtn.addEventListener("click", createRoomFirestore);
+    createBtn.addEventListener("click", createRoom);
   }
+
 </script>
 
 <!-- Bubble Background -->

@@ -1,3 +1,4 @@
+from flask import Flask, render_template, request, redirect, session, jsonify
 from flask import Flask, render_template, request, redirect, session
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import random
@@ -108,3 +109,10 @@ if __name__ == '__main__':
 @app.route('/meet/<room_id>')
 def meet(room_id):
     return render_template('room.html', room_id=room_id)
+
+@app.route('/api/create_room', methods=['POST'])
+def api_create_room():
+    room_id = f"room-{random.randint(100000, 999999)}"
+    if room_id not in active_rooms:
+        active_rooms.append(room_id)
+    return jsonify({'room_id': room_id})
