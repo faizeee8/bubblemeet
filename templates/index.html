@@ -225,7 +225,7 @@
         createdAt: new Date().toISOString()
       });
       console.log("Room saved to Firestore:", roomName);
-      window.location.href = `/meet/${roomName}`;
+      window.location.href = `/meet/${encodeURIComponent(roomName)}`;
     } catch (e) {
       console.error("Error saving room to Firestore:", e);
     }
