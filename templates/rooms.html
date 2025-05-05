@@ -1,0 +1,32 @@
+<!-- rooms.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Study Rooms</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Active Study Rooms</h1>
+        <a href="{{ url_for('index') }}">← Back to Home</a>
+    </header>
+
+    <section id="room-list">
+        {% if rooms %}
+            <ul>
+                {% for room_id, room_data in rooms.items() %}
+                    <li>
+                        <strong>{{ room_data.name }}</strong><br>
+                        Room ID: {{ room_id }}<br>
+                        <a href="{{ url_for('room_preview', room_id=room_id) }}">Preview Room</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No active rooms available.</p>
+        {% endif %}
+    </section>
+</body>
+</html>

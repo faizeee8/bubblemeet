@@ -214,7 +214,7 @@
 
 <div class="rooms-container">
   <h2>📌 Active Study Rooms</h2>
-  <div id="roomList">
+  <div class="active rooms" id="roomList">
     <div class="room" id="Math Study Group" onclick="joinRoom('Math Study Group')">📖 Math Study Group</div>
     <div class="room" id="Chemistry Revision Session" onclick="joinRoom('Chemistry Revision Session')">🧪 Chemistry Revision Session</div>
     <div class="room" id="Coding Bootcamp Discussion" onclick="joinRoom('Coding Bootcamp Discussion')">💻 Coding Bootcamp Discussion</div>
@@ -234,26 +234,45 @@
 <script>
   const socket = io();
 
-  const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
+  const emojis = ["📚", "🧠", "📝", "💡", "📖", "📐", "🧪", "🔬", "🎓", "💻"];
 
-  function getRandomEmoji() {
-    return studyEmojis[Math.floor(Math.random() * studyEmojis.length)];
+function getRandomEmoji() {
+  return emojis[Math.floor(Math.random() * emojis.length)];
   }
 
-  async function createRoom() {
-    try {
-      const response = await fetch("/api/create_room", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      const data = await response.json();
-      const roomId = data.room_id;
-      window.location.href = `/meet/${roomId}`;
-    } catch (error) {
-      console.error("Error creating room:", error);
-    }
+  function createRoom() {
+    const roomName = prompt("Enter a name for the study room:");
+    if (!roomName) return;
+
+    fetch('/api/create_room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_name: roomName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const roomId = data.room_id;
+        const newRoomName = data.room_name;
+        const roomList = document.getElementById("roomList");
+
+        const roomElement = document.createElement("div");
+        roomElement.className = "room";
+
+        roomElement.innerHTML = `
+            <a href="#" onclick="joinRoom('${roomId}')">
+                ${getRandomEmoji()} ${newRoomName}
+            </a>
+        `;
+
+        roomList.appendChild(roomElement);
+    });
+  }
+
+  function joinRoom(roomId) {
+    const username = prompt("Enter your name:");
+    if (!username) return;
+    localStorage.setItem("username", username);
+    window.location.href = `/meet/${roomId}`;
   }
 
   function joinRoom(roomName) {

@@ -414,10 +414,10 @@
   const ROOM_NAME = "{{ room_name }}";
   const socket = io();
   const peer = new Peer(undefined, {
-    host: '/',
-    port: location.port || 443,
-    path: '/peerjs'
-  });
+  host: 'peerjs-server.herokuapp.com',
+  secure: true,
+  port: 443
+ });
 
   const peers = {};
   const videoGrid = document.querySelector('.video-container');
@@ -490,9 +490,5 @@
     delete peers[peerId];
   });
 </script>
-
-
-
-
 </body>
 </html>
