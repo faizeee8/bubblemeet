@@ -245,7 +245,7 @@
     if (!roomName) return;
 
     fetch('/api/create_room', {
-      method: 'POST',
+      method: 'POST', 
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ room_name: roomName })
     })
@@ -309,20 +309,31 @@
   }
 
   function searchRoom() {
-    let searchQuery = prompt("Enter study room name:")?.trim();
-    if (searchQuery) {
-      let roomElement = document.getElementById(searchQuery);
-      if (roomElement) {
-        roomElement.scrollIntoView({ behavior: "smooth", block: "center" });
-        roomElement.style.backgroundColor = "#ffd966";
-        setTimeout(() => {
-          roomElement.style.backgroundColor = "";
-        }, 1500);
-      } else {
-        alert("No study room found with that name.");
-      }
+  const query = document.getElementById("searchInput").value.trim().toLowerCase();
+  const roomList = document.getElementById("roomList");
+  const rooms = roomList.getElementsByClassName("room");
+
+  let found = false;
+
+  for (const room of rooms) {
+    const roomName = room.textContent.trim().toLowerCase();
+
+    // Remove previous highlights
+    room.style.backgroundColor = "";
+    room.style.border = "";
+
+    if (roomName.includes(query)) {
+      room.style.backgroundColor = "#d1ffd6";
+      room.style.border = "2px solid green";
+      room.scrollIntoView({ behavior: "smooth", block: "center" });
+      found = true;
     }
   }
+
+  if (!found) {
+    alert("No study room found with that name.");
+  }
+}
 
   window.addEventListener("DOMContentLoaded", () => {
     const createBtn = document.getElementById("createBtn");
