@@ -13,20 +13,19 @@
         <a href="{{ url_for('index') }}">← Back to Home</a>
     </header>
 
-    <section id="room-list">
-        {% if rooms %}
-            <ul>
-                {% for room_id, room_data in rooms.items() %}
-                    <li>
-                        <strong>{{ room_data.name }}</strong><br>
-                        Room ID: {{ room_id }}<br>
-                        <a href="{{ url_for('room_preview', room_id=room_id) }}">Preview Room</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
+    <div class="rooms-container">
+        <h2>📌 Active Study Rooms</h2>
+        <div id="roomList">
+          {% if rooms %}
+            {% for room_id, room_data in rooms.items() %}
+              <div class="room" onclick="joinRoom('{{ room_id }}')">
+                {{ room_data.name }}
+              </div>
+            {% endfor %}
+          {% else %}
             <p>No active rooms available.</p>
-        {% endif %}
-    </section>
+          {% endif %}
+        </div>
+    </div>
 </body>
 </html>

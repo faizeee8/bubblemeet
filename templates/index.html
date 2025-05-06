@@ -234,10 +234,10 @@
 <script>
   const socket = io();
 
-  const emojis = ["📚", "🧠", "📝", "💡", "📖", "📐", "🧪", "🔬", "🎓", "💻"];
+  const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
 
-function getRandomEmoji() {
-  return emojis[Math.floor(Math.random() * emojis.length)];
+  function getRandomEmoji() {
+    return studyEmojis[Math.floor(Math.random() * studyEmojis.length)];
   }
 
   function createRoom() {
@@ -245,28 +245,48 @@ function getRandomEmoji() {
     if (!roomName) return;
 
     fetch('/api/create_room', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ room_name: roomName })
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ room_name: roomName })
     })
     .then(response => response.json())
     .then(data => {
-        const roomId = data.room_id;
-        const newRoomName = data.room_name;
-        const roomList = document.getElementById("roomList");
-
-        const roomElement = document.createElement("div");
-        roomElement.className = "room";
-
-        roomElement.innerHTML = `
-            <a href="#" onclick="joinRoom('${roomId}')">
-                ${getRandomEmoji()} ${newRoomName}
-            </a>
-        `;
-
-        roomList.appendChild(roomElement);
+      const roomId = data.room_id;
+      const roomName = data.room_name;
+      addRoomToList(roomId, roomName);
     });
   }
+
+  function addRoomToList(roomId, roomName) {
+    const roomList = document.getElementById("roomList");
+    const roomDiv = document.createElement("div");
+    roomDiv.className = "room";
+    roomDiv.id = roomId;
+    roomDiv.textContent = `${getRandomEmoji()} ${roomName}`;
+    roomDiv.onclick = () => joinRoom(roomId);
+    roomList.appendChild(roomDiv);
+  }
+
+  function joinRoom(roomId) {
+    const userName = prompt("Enter your name:");
+    if (!userName) return;
+    window.location.href = `/meet/${roomId}?user=${encodeURIComponent(userName)}`;
+  }
+
+  document.getElementById("createBtn").addEventListener("click", createRoom);
+
+  // Fetch and display existing rooms on page load
+  window.addEventListener("DOMContentLoaded", () => {
+    fetch('/api/rooms')
+      .then(response => response.json())
+      .then(data => {
+        const rooms = data.rooms;
+        for (const [roomId, roomData] of Object.entries(rooms)) {
+          addRoomToList(roomId, roomData.name);
+        }
+      });
+  });
+
 
   function joinRoom(roomId) {
     const username = prompt("Enter your name:");

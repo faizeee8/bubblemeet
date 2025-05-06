@@ -18,9 +18,11 @@ def index():
 def rooms():
     return render_template('rooms.html', rooms=active_rooms)
 
+
 @app.route('/meet/<room_id>')
 def meet(room_id):
-    return render_template('meet.html', room_id=room_id)
+    user_name = request.args.get('user', 'Guest')
+    return render_template('meet.html', room_id=room_id, user_name=user_name)
 
 @app.route('/room/<room_id>')
 def room_preview(room_id):
@@ -32,15 +34,14 @@ def room_preview(room_id):
 def create_room():
     data = request.get_json()
     room_name = data.get('room_name', 'Untitled Room')
-    room_id = str(uuid.uuid4())
-    rooms[room_id] = room_name
+    room_id = str(uuid.uuid4())[:8]
+    active_rooms[room_id] = {"name": room_name}
     return jsonify({'room_id': room_id, 'room_name': room_name})
-
-
 
 @app.route('/api/rooms', methods=['GET'])
 def get_rooms():
     return jsonify({"rooms": active_rooms})
+
 
 # --- Socket.IO Events ---
 @socketio.on('join-room')
