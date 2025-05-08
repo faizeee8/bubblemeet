@@ -57,7 +57,7 @@ def handle_disconnect():
 
 # --- Run using socketio ---
 if __name__ == '__main__':
- socketio.run(app, debug=True)
+    socketio.run(app, debug=True, port=5050)
 
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
@@ -114,7 +114,3 @@ def handle_join(data):
 @socketio.on('disconnect')
 def handle_disconnect():
     print('A user disconnected')
-
-# --- Run using socketio ---
-if __name__ == '__main__':
-    socketio.run(app, debug=True)
