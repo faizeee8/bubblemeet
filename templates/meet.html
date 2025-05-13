@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{{ room_name }}</title> <!-- Title now shows room name -->
+  <title>{{ room_name }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     body {
+      font-family: 'Poppins', sans-serif;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #121212;
+      padding: 0;
+      background: linear-gradient(to right, #614385, #516395);
       color: white;
+      text-align: center;
       overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
     }
 
     .video-container {
@@ -116,7 +119,7 @@
     }
 
     .dark-mode {
-      background-color: #121212;
+      background: #121212 !important;
       color: white;
     }
   </style>
@@ -303,7 +306,6 @@
       }
     }
 
-    // ✅ Press Enter to send chat
     document.getElementById('messageInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         sendMessage();

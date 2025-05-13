@@ -44,7 +44,6 @@ def create_room():
 def get_rooms():
     return jsonify({"rooms": active_rooms})
 
-
 # --- Socket.IO Events ---
 @socketio.on('join-room')
 def handle_join(data):
