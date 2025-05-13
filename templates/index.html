@@ -208,7 +208,7 @@
   <p>Join study groups, collaborate with friends, and enhance your learning experience.</p>
   <div class="buttons">
     <button id="createBtn">➕ Create Study Room</button>
-    <button id="searchBtn">🔍Search Study Room</button>    
+    <button id="searchBtn">🔍 Search Study Room</button>    
   </div>
 </div>
 
@@ -233,7 +233,6 @@
 <!-- Main Script -->
 <script>
   const socket = io();
-
   const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
 
   function getRandomEmoji() {
@@ -245,7 +244,7 @@
     if (!roomName) return;
 
     fetch('/api/create_room', {
-      method: 'POST', 
+      method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ room_name: roomName })
     })
@@ -268,14 +267,44 @@
   }
 
   function joinRoom(roomId) {
-    const userName = prompt("Enter your name:");
-    if (!userName) return;
-    window.location.href = `/meet/${roomId}?user=${encodeURIComponent(userName)}`;
+    const username = prompt("Enter your name:");
+    if (!username) return;
+    localStorage.setItem("username", username);
+    window.location.href = `/meet/${roomId}?user=${encodeURIComponent(username)}`;
+  }
+
+  function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle("dark-mode");
+    localStorage.setItem("darkMode", body.classList.contains("dark-mode"));
   }
 
   document.getElementById("createBtn").addEventListener("click", createRoom);
 
-  // Fetch and display existing rooms on page load
+  document.getElementById("searchBtn").addEventListener("click", function () {
+    const roomName = prompt("Enter the study room name:");
+    if (!roomName) return;
+
+    fetch('/api/rooms')
+      .then(response => response.json())
+      .then(data => {
+        const rooms = data.rooms;
+        const matchedRoom = Object.entries(rooms).find(([id, room]) =>
+          room.name.toLowerCase() === roomName.toLowerCase()
+        );
+
+        if (matchedRoom) {
+          const [roomId] = matchedRoom;
+          const userName = prompt("ROOM FOUND!!!Enter your name to join:");
+          if (userName) {
+            window.location.href = `/meet/${roomId}?user=${encodeURIComponent(userName)}`;
+          }
+        } else {
+          alert('Room not found!');
+        }
+      });
+  });
+
   window.addEventListener("DOMContentLoaded", () => {
     fetch('/api/rooms')
       .then(response => response.json())
@@ -285,61 +314,6 @@
           addRoomToList(roomId, roomData.name);
         }
       });
-  });
-
-
-  function joinRoom(roomId) {
-    const username = prompt("Enter your name:");
-    if (!username) return;
-    localStorage.setItem("username", username);
-    window.location.href = `/meet/${roomId}`;
-  }
-
-  function joinRoom(roomName) {
-    document.getElementById("loadingScreen").style.display = "flex";
-    setTimeout(() => {
-      window.location.href = `/meet/${encodeURIComponent(roomName)}`;
-    }, 1000);
-  }
-
-  function toggleDarkMode() {
-    const body = document.body;
-    body.classList.toggle("dark-mode");
-    localStorage.setItem("darkMode", body.classList.contains("dark-mode"));
-  }
-
-  function searchRoom() {
-  const query = document.getElementById("searchInput").value.trim().toLowerCase();
-  const roomList = document.getElementById("roomList");
-  const rooms = roomList.getElementsByClassName("room");
-
-  let found = false;
-
-  for (const room of rooms) {
-    const roomName = room.textContent.trim().toLowerCase();
-
-    // Remove previous highlights
-    room.style.backgroundColor = "";
-    room.style.border = "";
-
-    if (roomName.includes(query)) {
-      room.style.backgroundColor = "#d1ffd6";
-      room.style.border = "2px solid green";
-      room.scrollIntoView({ behavior: "smooth", block: "center" });
-      found = true;
-    }
-  }
-
-  if (!found) {
-    alert("No study room found with that name.");
-  }
-}
-
-  window.addEventListener("DOMContentLoaded", () => {
-    const createBtn = document.getElementById("createBtn");
-    if (createBtn) {
-      createBtn.addEventListener("click", createRoom);
-    }
 
     const bubbleContainer = document.getElementById("bubbleContainer");
     for (let i = 0; i < 30; i++) {
