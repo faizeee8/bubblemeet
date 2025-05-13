@@ -22,7 +22,9 @@ def rooms():
 @app.route('/meet/<room_id>')
 def meet(room_id):
     user_name = request.args.get('user', 'Guest')
-    return render_template('meet.html', room_id=room_id, user_name=user_name)
+    room_name = active_rooms.get(room_id, {}).get('name', 'Bubblemeet')
+    return render_template('meet.html', room_id=room_id, user_name=user_name, room_name=room_name)
+
 
 @app.route('/room/<room_id>')
 def room_preview(room_id):
@@ -82,7 +84,9 @@ def rooms():
 @app.route('/meet/<room_id>')
 def meet(room_id):
     user_name = request.args.get('user', 'Guest')
-    return render_template('meet.html', room_id=room_id, user_name=user_name)
+    room_name = active_rooms.get(room_id, {}).get('name', 'Bubblemeet')
+    return render_template('meet.html', room_id=room_id, user_name=user_name, room_name=room_name)
+
 
 @app.route('/room/<room_id>')
 def room_preview(room_id):

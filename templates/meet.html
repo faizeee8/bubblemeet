@@ -3,492 +3,324 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StudySphere Meeting Room</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"/>
+  <title>{{ room_name }}</title> <!-- Title now shows room name -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
     body {
-      font-family: 'Poppins', sans-serif;
       margin: 0;
-      padding: 0;
-      background: linear-gradient(to right, #614385, #516395);
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
       color: white;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      overflow-y: auto;
-    }
-
-    .dark-mode {
-      background: #121212 !important;
-      color: white !important;
-    }
-
-    .toggle-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .toggle-switch {
-      cursor: pointer;
-      padding: 10px 20px;
-      background-color: #ff5e62;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      font-size: 16px;
-      z-index: 1001;
-    }
-
-    .toggle-switch:hover {
-      background-color: #e14e53;
+      overflow-x: hidden;
     }
 
     .video-container {
-      width: 80%;
-      max-width: 800px;
-      height: 450px;
-      background: black;
-      border-radius: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       padding: 20px;
+      gap: 10px;
+    }
+
+    .video-box {
       position: relative;
-      margin-top: 80px;
-      margin-bottom: 20px;
+      background: black;
+      border-radius: 8px;
       overflow: hidden;
     }
 
     video {
-      width: 100%;
-      height: 100%;
+      width: 300px;
+      height: 225px;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 8px;
     }
 
     .username-overlay {
       position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 18px;
+      bottom: 5px;
+      left: 5px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2px 6px;
+      font-size: 12px;
+      border-radius: 4px;
     }
 
     .controls {
-      margin-top: 20px;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px 20px;
+      border-radius: 30px;
     }
 
-    .btn {
-      background: #ff5e62;
+    .controls button {
+      background: #1e1e1e;
       color: white;
       border: none;
-      padding: 15px 20px;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
       font-size: 18px;
-      border-radius: 10px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
 
-    .btn:hover {
-      background: #e14e53;
-    }
-
-    .btn.off {
-      background: #888;
-      color: white;
-    }
-
-    .leave-btn {
-      background: transparent;
-      border: 3px solid red;
-      color: red;
-      padding: 15px 30px;
-      font-size: 20px;
-      font-weight: bold;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .leave-btn:hover {
-      background: red;
-      color: white;
+    .controls button:hover {
+      background: #333;
     }
 
     .chat-box {
       position: fixed;
-      bottom: 20px;
       right: 20px;
+      bottom: 90px;
       width: 250px;
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 10px;
-      padding: 10px;
-      color: white;
-      font-size: 14px;
+      height: 300px;
+      background: #1e1e1e;
+      border-radius: 8px;
       display: flex;
       flex-direction: column;
-      transition: all 0.3s ease;
-      z-index: 1001;
-    }
-
-    .chat-box.minimized {
-      height: 50px;
       overflow: hidden;
     }
 
     .chat-messages {
-      height: 150px;
+      flex: 1;
       overflow-y: auto;
-      border-bottom: 1px solid #666;
-      padding-bottom: 5px;
-    }
-
-    .chat-messages div {
-      text-align: left;
-      margin: 5px 0;
-      padding: 5px;
-      background: #333;
-      border-radius: 5px;
+      padding: 10px;
+      font-size: 14px;
     }
 
     .chat-input {
       display: flex;
+      border-top: 1px solid #333;
     }
 
     .chat-input input {
       flex: 1;
-      padding: 5px;
       border: none;
-      border-radius: 5px;
-      outline: none;
+      padding: 10px;
+      background: #222;
+      color: white;
     }
 
     .chat-input button {
-      background: #ff5e62;
+      background: #444;
       color: white;
       border: none;
-      padding: 5px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-left: 5px;
-    }
-
-    .minimize-btn {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-      padding: 5px;
+      padding: 0 15px;
       cursor: pointer;
     }
 
-    @media screen and (max-width: 768px) {
-      .video-container {
-        width: 95%;
-        height: 250px;
-        padding: 10px;
-        margin-top: 100px;
-      }
-
-      .toggle-container {
-        flex-direction: column;
-        top: 10px;
-        right: 10px;
-        gap: 5px;
-      }
-
-      .controls {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .chat-box {
-        width: 90%;
-        right: 5%;
-        bottom: 15px;
-      }
+    .dark-mode {
+      background-color: #121212;
+      color: white;
     }
   </style>
 </head>
 <body>
+  <h2 style="text-align: center; margin-top: 10px;">Bubblemeet Room: {{ room_name }}</h2>
 
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-  
+  <div class="video-container" id="video-container"></div>
 
-<div class="toggle-container">
-  <button class="toggle-switch" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
-  <button class="toggle-switch" onclick="toggleFullscreen()">🖥️ Fullscreen</button>
-</div>
-
-<div class="video-container">
-  <video id="videoElement" autoplay muted></video>
-  <div class="username-overlay" id="usernameOverlay"></div>
-</div>
-
-<div class="controls">
-  <button class="btn" id="micBtn" onclick="toggleMic()">🎤 Toggle Mic</button>
-  <button class="btn" id="videoBtn" onclick="toggleVideo()">📹 Toggle Video</button>
-  <button class="btn" id="shareScreenBtn" style="display: none;" onclick="toggleScreenShare()">🖥️ Share Screen</button>
-  <button class="leave-btn" onclick="window.location.href='/'">🚪 Leave Meeting</button>
-</div>
-
-<div class="chat-box" id="chatBox">
-  <button class="minimize-btn" onclick="toggleMinimize()">_</button>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-input">
-    <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="handleEnter(event)">
-    <button onclick="sendMessage()">Send</button>
+  <div class="controls">
+    <button id="toggleMic" title="Mic">🎤</button>
+    <button id="toggleVideo" title="Video">📷</button>
+    <button id="shareScreen" title="Share Screen">🖥️</button>
+    <button id="fullscreenBtn" title="Fullscreen">⛶</button>
+    <button onclick="leaveMeeting()" title="Leave">❌</button>
+    <button onclick="toggleDarkMode()" title="Dark Mode">🌙</button>
   </div>
-</div>
 
-<script>
-  function applyDarkMode() {
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark-mode");
-    } else {
-      document.body.classList.remove("dark-mode");
+  <div class="chat-box">
+    <div class="chat-messages" id="messages"></div>
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Message..." />
+      <button onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.3.2/dist/peerjs.min.js"></script>
+  <script>
+    const socket = io();
+    const peer = new Peer(undefined, {
+      host: 'peerjs-server.herokuapp.com',
+      secure: true,
+      port: 443
+    });
+
+    const roomName = "{{ room_name }}";
+    const userName = prompt("Enter your name") || "Anonymous";
+
+    const videoContainer = document.getElementById('video-container');
+    const toggleMicBtn = document.getElementById('toggleMic');
+    const toggleVideoBtn = document.getElementById('toggleVideo');
+    const shareScreenBtn = document.getElementById('shareScreen');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    let localStream;
+    let screenStream;
+    let screenSharingUser = null;
+    const peers = {};
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+      localStream = stream;
+      addVideoStream(createVideoElement(), stream, userName);
+
+      peer.on('call', call => {
+        call.answer(stream);
+        const video = createVideoElement();
+        call.on('stream', remoteStream => {
+          addVideoStream(video, remoteStream, call.metadata?.userName || "Peer");
+        });
+        call.on('close', () => video.parentElement.remove());
+        peers[call.peer] = call;
+      });
+
+      socket.emit('join-room', { roomName, peerId: peer.id, userName });
+
+      socket.on('user-connected', ({ peerId, userName: remoteName }) => {
+        const call = peer.call(peerId, stream, { metadata: { userName } });
+        const video = createVideoElement();
+        call.on('stream', remoteStream => {
+          addVideoStream(video, remoteStream, remoteName);
+        });
+        call.on('close', () => video.parentElement.remove());
+        peers[peerId] = call;
+      });
+
+      socket.on('user-disconnected', peerId => {
+        if (peers[peerId]) peers[peerId].close();
+      });
+    });
+
+    peer.on('open', id => {
+      socket.emit('join-room', { roomName, peerId: id, userName });
+    });
+
+    function createVideoElement() {
+      const video = document.createElement('video');
+      video.autoplay = true;
+      video.playsInline = true;
+      return video;
     }
-  }
 
-  function toggleDarkMode() {
-    if (document.body.classList.contains("dark-mode")) {
-      localStorage.setItem("theme", "light");
-    } else {
-      localStorage.setItem("theme", "dark");
-    }
-    applyDarkMode();
-  }
+    function addVideoStream(video, stream, name) {
+      video.srcObject = stream;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'video-box';
+      wrapper.appendChild(video);
 
-  function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  }
+      const label = document.createElement('div');
+      label.className = 'username-overlay';
+      label.innerText = name;
+      wrapper.appendChild(label);
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && document.fullscreenElement) {
-      document.exitFullscreen();
-    }
-  });
-
-  applyDarkMode();
-
-  let video = document.getElementById("videoElement");
-  let micBtn = document.getElementById("micBtn");
-  let videoBtn = document.getElementById("videoBtn");
-  let usernameOverlay = document.getElementById("usernameOverlay");
-  let shareScreenBtn = document.getElementById("shareScreenBtn");
-  let chatMessages = document.getElementById("chatMessages");
-  let chatInput = document.getElementById("chatInput");
-  let userName = "";
-  let localStream;
-  let screenStream = null;
-
-  async function askForName() {
-    userName = prompt("Give yourself a name:");
-    if (!userName) {
-      window.location.href = "/";
-      return;
+      videoContainer.appendChild(wrapper);
     }
 
-    usernameOverlay.innerText = userName;
-
-    if (!localStorage.getItem("host")) {
-      localStorage.setItem("host", userName);
-      shareScreenBtn.style.display = "inline-block";
+    function toggleMic() {
+      const enabled = localStream.getAudioTracks()[0].enabled;
+      localStream.getAudioTracks()[0].enabled = !enabled;
+      toggleMicBtn.innerText = enabled ? "🔇" : "🎤";
     }
 
-    try {
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      video.srcObject = localStream;
-    } catch (err) {
-      console.error("Error accessing camera/mic:", err);
-      alert("Please allow camera and microphone access.");
+    function toggleVideo() {
+      const enabled = localStream.getVideoTracks()[0].enabled;
+      localStream.getVideoTracks()[0].enabled = !enabled;
+      toggleVideoBtn.innerText = enabled ? "📷" : "📷";
     }
-  }
 
-  window.onload = () => {
-    applyDarkMode();
-    askForName();
-  };
+    function startScreenShare() {
+      navigator.mediaDevices.getDisplayMedia({ video: true }).then(stream => {
+        screenStream = stream;
+        screenSharingUser = userName;
+        shareScreenBtn.innerText = "🛑";
 
-  function sendMessage() {
-    let message = chatInput.value;
-    if (message) {
-      let messageDiv = document.createElement("div");
-      messageDiv.innerText = `${userName}: ${message}`;
-      chatMessages.appendChild(messageDiv);
-      chatInput.value = "";
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+        stream.getVideoTracks()[0].onended = stopScreenShare;
+
+        Object.values(peers).forEach(call => {
+          call.peerConnection.getSenders().forEach(sender => {
+            if (sender.track.kind === "video") {
+              sender.replaceTrack(screenStream.getVideoTracks()[0]);
+            }
+          });
+        });
+
+        const myVideo = videoContainer.querySelector('video');
+        myVideo.srcObject = screenStream;
+      });
     }
-  }
 
-  function handleEnter(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      sendMessage();
-    }
-  }
-
-  function toggleMinimize() {
-    let chatBox = document.getElementById("chatBox");
-    chatBox.classList.toggle("minimized");
-  }
-
-  async function startScreenShare() {
-    try {
-      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-      const screenTrack = screenStream.getVideoTracks()[0];
-      video.srcObject = screenStream;
-
-      screenTrack.onended = () => stopScreenShare();
-      shareScreenBtn.innerHTML = "🛑 Stop Screen Share";
-    } catch (e) {
-      console.error("Error sharing screen:", e);
-    }
-  }
-
-  function stopScreenShare() {
-    if (screenStream) {
-      screenStream.getTracks().forEach((track) => track.stop());
+    function stopScreenShare() {
+      if (!screenStream) return;
+      screenStream.getTracks().forEach(track => track.stop());
       screenStream = null;
-      shareScreenBtn.innerHTML = "🖥️ Share Screen";
-      video.srcObject = localStream;
+      screenSharingUser = null;
+      shareScreenBtn.innerText = "🖥️";
+
+      Object.values(peers).forEach(call => {
+        call.peerConnection.getSenders().forEach(sender => {
+          if (sender.track.kind === "video") {
+            sender.replaceTrack(localStream.getVideoTracks()[0]);
+          }
+        });
+      });
+
+      const myVideo = videoContainer.querySelector('video');
+      myVideo.srcObject = localStream;
     }
-  }
 
-  function toggleScreenShare() {
-    if (screenStream) {
-      stopScreenShare();
-    } else {
-      startScreenShare();
+    function toggleScreenShare() {
+      if (screenSharingUser && screenSharingUser !== userName) {
+        alert("Multiple screen sharing not allowed.");
+        return;
+      }
+      if (screenStream) stopScreenShare();
+      else startScreenShare();
     }
-  }
 
-  function toggleMic() {
-    const audioTrack = localStream.getAudioTracks()[0];
-    if (audioTrack) {
-      audioTrack.enabled = !audioTrack.enabled;
-      micBtn.innerText = audioTrack.enabled ? "🎤 Toggle Mic" : "🔇 Mic Off";
-      micBtn.classList.toggle("off", !audioTrack.enabled);
+    function leaveMeeting() {
+      window.location.href = "/";
     }
-  }
 
-  function toggleVideo() {
-    const videoTrack = localStream.getVideoTracks()[0];
-    if (videoTrack) {
-      videoTrack.enabled = !videoTrack.enabled;
-      videoBtn.innerText = videoTrack.enabled ? "📹 Toggle Video" : "📷 Video Off";
-      videoBtn.classList.toggle("off", !videoTrack.enabled);
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
     }
-  }
-</script>
 
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const msg = input.value.trim();
+      if (msg) {
+        const div = document.createElement('div');
+        div.textContent = userName + ": " + msg;
+        document.getElementById('messages').appendChild(div);
+        input.value = "";
+      }
+    }
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-
-<script>
-  const ROOM_NAME = "{{ room_name }}";
-  const socket = io();
-  const peer = new Peer(undefined, {
-  host: 'peerjs-server.herokuapp.com',
-  secure: true,
-  port: 443
- });
-
-  const peers = {};
-  const videoGrid = document.querySelector('.video-container');
-
-  // Wait for PeerJS to connect and get ID
-  peer.on('open', (id) => {
-    socket.emit('join-room', { roomName: ROOM_NAME, peerId: id, userName });
-  });
-
-  socket.on('user-connected', ({ peerId, userName: remoteName }) => {
-    setTimeout(() => {
-      connectToNewUser(peerId, localStream, remoteName);
-    }, 1000); // slight delay to ensure readiness
-  });
-
-  peer.on('call', (call) => {
-    call.answer(localStream);
-    const video = document.createElement('video');
-    video.playsInline = true;
-
-    call.on('stream', (remoteStream) => {
-      addVideoStream(video, remoteStream, "Peer");
+    // ✅ Press Enter to send chat
+    document.getElementById('messageInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
     });
 
-    call.on('close', () => {
-      video.parentElement?.remove();
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
     });
 
-    peers[call.peer] = call;
-  });
-
-  function connectToNewUser(peerId, stream, name) {
-    if (peers[peerId]) return; // Avoid duplicates
-    const call = peer.call(peerId, stream);
-    const video = document.createElement('video');
-    video.playsInline = true;
-
-    call.on('stream', (remoteStream) => {
-      addVideoStream(video, remoteStream, name);
-    });
-
-    call.on('close', () => {
-      video.parentElement?.remove();
-    });
-
-    peers[peerId] = call;
-  }
-
-  function addVideoStream(video, stream, label) {
-    video.srcObject = stream;
-    video.addEventListener('loadedmetadata', () => {
-      video.play();
-    });
-
-    const wrapper = document.createElement('div');
-    wrapper.style.position = 'relative';
-    wrapper.style.marginTop = '10px';
-    wrapper.appendChild(video);
-
-    const overlay = document.createElement('div');
-    overlay.classList.add('username-overlay');
-    overlay.textContent = label;
-    wrapper.appendChild(overlay);
-
-    videoGrid.appendChild(wrapper);
-  }
-
-  socket.on('user-disconnected', (peerId) => {
-    if (peers[peerId]) peers[peerId].close();
-    delete peers[peerId];
-  });
-</script>
+    toggleMicBtn.onclick = toggleMic;
+    toggleVideoBtn.onclick = toggleVideo;
+    shareScreenBtn.onclick = toggleScreenShare;
+  </script>
 </body>
 </html>
