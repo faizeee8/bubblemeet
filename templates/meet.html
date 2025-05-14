@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{{ room_name }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -16,7 +17,17 @@
       overflow-x: hidden;
       transition: background 0.3s, color 0.3s;
     }
-
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
     .video-container {
       display: flex;
       flex-wrap: wrap;
@@ -24,21 +35,30 @@
       padding: 20px;
       gap: 10px;
     }
-
     .video-box {
       position: relative;
       background: black;
       border-radius: 8px;
       overflow: hidden;
-    }
-
-    video {
       width: 300px;
       height: 225px;
+    }
+    video {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       border-radius: 8px;
     }
-
+    .avatar-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      background: #333;
+      border-radius: 8px;
+    }
     .username-overlay {
       position: absolute;
       bottom: 5px;
@@ -48,7 +68,6 @@
       font-size: 12px;
       border-radius: 4px;
     }
-
     .controls {
       position: fixed;
       bottom: 20px;
@@ -60,7 +79,6 @@
       padding: 10px 20px;
       border-radius: 30px;
     }
-
     .controls button {
       background: #1e1e1e;
       color: white;
@@ -72,11 +90,9 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     .controls button:hover {
       background: #333;
     }
-
     .chat-box {
       position: fixed;
       right: 20px;
@@ -89,19 +105,16 @@
       flex-direction: column;
       overflow: hidden;
     }
-
     .chat-messages {
       flex: 1;
       overflow-y: auto;
       padding: 10px;
       font-size: 14px;
     }
-
     .chat-input {
       display: flex;
       border-top: 1px solid #333;
     }
-
     .chat-input input {
       flex: 1;
       border: none;
@@ -109,7 +122,6 @@
       background: #222;
       color: white;
     }
-
     .chat-input button {
       background: #444;
       color: white;
@@ -117,15 +129,43 @@
       padding: 0 15px;
       cursor: pointer;
     }
-
     .dark-mode {
       background: #121212 !important;
       color: white;
     }
+
+    /* Toast notification */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+    }
+    .toast {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px 16px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      animation: fadeOut 4s forwards;
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
   </style>
 </head>
 <body>
-  <h2 style="text-align: center; margin-top: 10px;">Bubblemeet Room: {{ room_name }}</h2>
+  <div id="loading-screen">
+    <h2>Requesting camera & mic access...</h2>
+    <p>Please allow permissions to continue.</p>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <h2 style="margin-top: 10px;">Bubblemeet Room: {{ room_name }}</h2>
 
   <div class="video-container" id="video-container"></div>
 
@@ -150,11 +190,7 @@
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.3.2/dist/peerjs.min.js"></script>
   <script>
     const socket = io();
-    const peer = new Peer(undefined, {
-      host: 'peerjs-server.herokuapp.com',
-      secure: true,
-      port: 443
-    });
+    const peer = new Peer();
 
     const roomName = "{{ room_name }}";
     const userName = prompt("Enter your name") || "Anonymous";
@@ -164,13 +200,32 @@
     const toggleVideoBtn = document.getElementById('toggleVideo');
     const shareScreenBtn = document.getElementById('shareScreen');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const loadingScreen = document.getElementById('loading-screen');
 
     let localStream;
     let screenStream;
     let screenSharingUser = null;
     const peers = {};
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+    // Toast Notification
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerText = message;
+      document.getElementById('toast-container').appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    window.onload = () => {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert("Your browser doesn't support video/audio capture.");
+    window.location.href = "/";
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      loadingScreen.style.display = 'none';
       localStream = stream;
       addVideoStream(createVideoElement(), stream, userName);
 
@@ -184,9 +239,19 @@
         peers[call.peer] = call;
       });
 
-      socket.emit('join-room', { roomName, peerId: peer.id, userName });
+      peer.on('open', id => {
+        socket.emit('join-room', { roomName, peerId: id, userName });
+      });
+
+      socket.on('chat-message', data => {
+        const div = document.createElement('div');
+        div.textContent = `${data.user}: ${data.message}`;
+        document.getElementById('messages').appendChild(div);
+        showToast(`${data.user} says: ${data.message}`);
+      });
 
       socket.on('user-connected', ({ peerId, userName: remoteName }) => {
+        showToast(`${remoteName} joined the room`);
         const call = peer.call(peerId, stream, { metadata: { userName } });
         const video = createVideoElement();
         call.on('stream', remoteStream => {
@@ -198,12 +263,22 @@
 
       socket.on('user-disconnected', peerId => {
         if (peers[peerId]) peers[peerId].close();
+        showToast(`A user left the room`);
       });
+    })
+    .catch(error => {
+      console.error("Media access error:", error);
+      let message = "Camera and microphone access is required to join.";
+      if (error.name === "NotAllowedError") {
+        message = "Permission denied. Please allow access to camera and microphone.";
+      } else if (error.name === "NotFoundError") {
+        message = "No media devices found. Please connect a camera and microphone.";
+      }
+      alert(message);
+      window.location.href = "/";
     });
+};
 
-    peer.on('open', id => {
-      socket.emit('join-room', { roomName, peerId: id, userName });
-    });
 
     function createVideoElement() {
       const video = document.createElement('video');
@@ -213,16 +288,17 @@
     }
 
     function addVideoStream(video, stream, name) {
-      video.srcObject = stream;
       const wrapper = document.createElement('div');
       wrapper.className = 'video-box';
+      const overlay = document.createElement('div');
+      overlay.className = 'username-overlay';
+      overlay.innerText = name;
+
+      video.srcObject = stream;
+      video.onloadedmetadata = () => video.play();
+
       wrapper.appendChild(video);
-
-      const label = document.createElement('div');
-      label.className = 'username-overlay';
-      label.innerText = name;
-      wrapper.appendChild(label);
-
+      wrapper.appendChild(overlay);
       videoContainer.appendChild(wrapper);
     }
 
@@ -233,9 +309,27 @@
     }
 
     function toggleVideo() {
-      const enabled = localStream.getVideoTracks()[0].enabled;
-      localStream.getVideoTracks()[0].enabled = !enabled;
-      toggleVideoBtn.innerText = enabled ? "📷" : "📷";
+      const videoTrack = localStream.getVideoTracks()[0];
+      videoTrack.enabled = !videoTrack.enabled;
+      toggleVideoBtn.innerText = videoTrack.enabled ? "📷" : "🙈";
+
+      const myVideoBox = document.querySelector('.video-box');
+      const videoElement = myVideoBox.querySelector('video');
+
+      if (!videoTrack.enabled) {
+        videoElement.style.display = "none";
+        let fallback = myVideoBox.querySelector('.avatar-fallback');
+        if (!fallback) {
+          fallback = document.createElement('div');
+          fallback.className = 'avatar-fallback';
+          fallback.textContent = userName.split(' ').map(w => w[0]).join('').toUpperCase();
+          myVideoBox.insertBefore(fallback, myVideoBox.firstChild);
+        }
+      } else {
+        videoElement.style.display = "block";
+        const fallback = myVideoBox.querySelector('.avatar-fallback');
+        if (fallback) fallback.remove();
+      }
     }
 
     function startScreenShare() {
@@ -243,9 +337,7 @@
         screenStream = stream;
         screenSharingUser = userName;
         shareScreenBtn.innerText = "🛑";
-
         stream.getVideoTracks()[0].onended = stopScreenShare;
-
         Object.values(peers).forEach(call => {
           call.peerConnection.getSenders().forEach(sender => {
             if (sender.track.kind === "video") {
@@ -253,7 +345,6 @@
             }
           });
         });
-
         const myVideo = videoContainer.querySelector('video');
         myVideo.srcObject = screenStream;
       });
@@ -265,7 +356,6 @@
       screenStream = null;
       screenSharingUser = null;
       shareScreenBtn.innerText = "🖥️";
-
       Object.values(peers).forEach(call => {
         call.peerConnection.getSenders().forEach(sender => {
           if (sender.track.kind === "video") {
@@ -273,14 +363,13 @@
           }
         });
       });
-
       const myVideo = videoContainer.querySelector('video');
       myVideo.srcObject = localStream;
     }
 
     function toggleScreenShare() {
       if (screenSharingUser && screenSharingUser !== userName) {
-        alert("Multiple screen sharing not allowed.");
+        showToast("Multiple screen sharing not allowed.");
         return;
       }
       if (screenStream) stopScreenShare();
@@ -299,17 +388,13 @@
       const input = document.getElementById('messageInput');
       const msg = input.value.trim();
       if (msg) {
-        const div = document.createElement('div');
-        div.textContent = userName + ": " + msg;
-        document.getElementById('messages').appendChild(div);
+        socket.emit('chat-message', { user: userName, message: msg });
         input.value = "";
       }
     }
 
     document.getElementById('messageInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
+      if (e.key === 'Enter') sendMessage();
     });
 
     fullscreenBtn.addEventListener('click', () => {
