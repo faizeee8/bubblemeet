@@ -103,6 +103,10 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: height 0.3s ease;
+    }
+    .chat-box.collapsed {
+      height: 40px;
     }
     .chat-messages {
       flex: 1;
@@ -142,6 +146,16 @@
       padding: 5px 10px;
       cursor: pointer;
       font-size: 12px;
+      z-index: 1;
+    }
+    .minimize-btn .red-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: red;
+      border-radius: 50%;
+      margin-left: 5px;
+      vertical-align: middle;
     }
     #toast-container {
       position: fixed;
@@ -205,13 +219,9 @@
     const userName = prompt("Enter your name") || "Anonymous";
 
     const videoContainer = document.getElementById('video-container');
-    const toggleMicBtn = document.getElementById('toggleMic');
-    const toggleVideoBtn = document.getElementById('toggleVideo');
-    const shareScreenBtn = document.getElementById('shareScreen');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
     const minimizeChatBtn = document.getElementById('minimizeChat');
     const chatBox = document.getElementById('chatBox');
-    const loadingScreen = document.getElementById('loading-screen');
+    const messagesContainer = document.getElementById('messages');
 
     let localStream;
     let screenStream;
@@ -227,66 +237,52 @@
     }
 
     window.onload = () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Your browser doesn't support video/audio capture.");
-        window.location.href = "/";
-        return;
-      }
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+        document.getElementById('loading-screen').style.display = 'none';
+        localStream = stream;
+        addVideoStream(createVideoElement(), stream, userName);
 
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => {
-          loadingScreen.style.display = 'none';
-          localStream = stream;
-          addVideoStream(createVideoElement(), stream, userName);
-
-          peer.on('call', call => {
-            call.answer(stream);
-            const video = createVideoElement();
-            call.on('stream', remoteStream => {
-              addVideoStream(video, remoteStream, call.metadata?.userName || "Peer");
-            });
-            call.on('close', () => video.parentElement.remove());
-            peers[call.peer] = call;
+        peer.on('call', call => {
+          call.answer(stream);
+          const video = createVideoElement();
+          call.on('stream', remoteStream => {
+            addVideoStream(video, remoteStream, call.metadata?.userName || "Peer");
           });
-
-          peer.on('open', id => {
-            socket.emit('join-room', { roomName, peerId: id, userName });
-          });
-
-          socket.on('chat-message', data => {
-            const div = document.createElement('div');
-            div.textContent = `${data.user}: ${data.message}`;
-            document.getElementById('messages').appendChild(div);
-            showToast(`${data.user} says: ${data.message}`);
-          });
-
-          socket.on('user-connected', ({ peerId, userName: remoteName }) => {
-            showToast(`${remoteName} joined the room`);
-            const call = peer.call(peerId, stream, { metadata: { userName } });
-            const video = createVideoElement();
-            call.on('stream', remoteStream => {
-              addVideoStream(video, remoteStream, remoteName);
-            });
-            call.on('close', () => video.parentElement.remove());
-            peers[peerId] = call;
-          });
-
-          socket.on('user-disconnected', peerId => {
-            if (peers[peerId]) peers[peerId].close();
-            showToast("A user left the room");
-          });
-        })
-        .catch(error => {
-          console.error("Media access error:", error);
-          let message = "Camera and microphone access is required to join.";
-          if (error.name === "NotAllowedError") {
-            message = "Permission denied. Please allow access to camera and microphone.";
-          } else if (error.name === "NotFoundError") {
-            message = "No media devices found. Please connect a camera and microphone.";
-          }
-          alert(message);
-          window.location.href = "/";
+          call.on('close', () => video.parentElement.remove());
+          peers[call.peer] = call;
         });
+
+        peer.on('open', id => {
+          socket.emit('join-room', { roomName, peerId: id, userName });
+        });
+
+        socket.on('chat-message', data => {
+          const div = document.createElement('div');
+          div.textContent = `${data.user}: ${data.message}`;
+          messagesContainer.appendChild(div);
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          showToast(`${data.user} says: ${data.message}`);
+          if (chatBox.classList.contains('collapsed')) {
+            showRedDot();
+          }
+        });
+
+        socket.on('user-connected', ({ peerId, userName: remoteName }) => {
+          showToast(`${remoteName} joined the room`);
+          const call = peer.call(peerId, stream, { metadata: { userName } });
+          const video = createVideoElement();
+          call.on('stream', remoteStream => {
+            addVideoStream(video, remoteStream, remoteName);
+          });
+          call.on('close', () => video.parentElement.remove());
+          peers[peerId] = call;
+        });
+
+        socket.on('user-disconnected', peerId => {
+          if (peers[peerId]) peers[peerId].close();
+          showToast("A user left the room");
+        });
+      });
     };
 
     function createVideoElement() {
@@ -319,45 +315,36 @@
       videoContainer.appendChild(box);
     }
 
-    toggleMicBtn.onclick = () => {
+    document.getElementById('toggleMic').onclick = () => {
       const audioTrack = localStream.getAudioTracks()[0];
       audioTrack.enabled = !audioTrack.enabled;
-      toggleMicBtn.textContent = audioTrack.enabled ? '🎤' : '🔇';
     };
 
-    toggleVideoBtn.onclick = () => {
+    document.getElementById('toggleVideo').onclick = () => {
       const videoTrack = localStream.getVideoTracks()[0];
       videoTrack.enabled = !videoTrack.enabled;
-      toggleVideoBtn.textContent = videoTrack.enabled ? '📷' : '📷🚫';
     };
 
-    shareScreenBtn.onclick = async () => {
+    document.getElementById('shareScreen').onclick = async () => {
       if (screenSharingUser) {
         alert("Multiple screen sharing not allowed.");
         return;
       }
-
       try {
         screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
         screenSharingUser = userName;
         const screenVideo = createVideoElement();
         addVideoStream(screenVideo, screenStream, `${userName} (Screen)`);
-
         screenStream.getVideoTracks()[0].onended = () => {
           screenVideo.parentElement.remove();
           screenSharingUser = null;
         };
-      } catch (err) {
-        console.log("Screen share cancelled");
-      }
+      } catch (err) {}
     };
 
-    fullscreenBtn.onclick = () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
+    document.getElementById('fullscreenBtn').onclick = () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
     };
 
     function toggleDarkMode() {
@@ -370,16 +357,30 @@
 
     minimizeChatBtn.onclick = () => {
       chatBox.classList.toggle('collapsed');
+      removeRedDot();
     };
+
+    function showRedDot() {
+      if (!document.querySelector('.red-dot')) {
+        const dot = document.createElement('span');
+        dot.className = 'red-dot';
+        minimizeChatBtn.appendChild(dot);
+      }
+    }
+
+    function removeRedDot() {
+      const dot = document.querySelector('.red-dot');
+      if (dot) dot.remove();
+    }
 
     function sendMessage() {
       const input = document.getElementById('messageInput');
       const msg = input.value.trim();
       if (msg) {
         const div = document.createElement('div');
-        div.textContent = `You: ${msg}`;
-        document.getElementById('messages').appendChild(div);
-        document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        div.textContent = `${userName}: ${msg}`;
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
         socket.emit('chat-message', { user: userName, message: msg });
         input.value = "";
       }
