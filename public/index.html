@@ -216,9 +216,9 @@
 <div class="rooms-container">
   <h2>📌 Active Study Rooms</h2>
   <div class="active rooms" id="roomList">
-    <div class="room" id="Math Study Group" onclick="joinRoom('Math Study Group')">📖 Math Study Group</div>
-    <div class="room" id="Chemistry Revision Session" onclick="joinRoom('Chemistry Revision Session')">🧪 Chemistry Revision Session</div>
-    <div class="room" id="Coding Bootcamp Discussion" onclick="joinRoom('Coding Bootcamp Discussion')">💻 Coding Bootcamp Discussion</div>
+   <div class="room" id="Math Study Group" onclick="joinRoom('Math Study Group')">📖 Math Study Group</div>
+   <div class="room" id="Chemistry Revision Session" onclick="joinRoom('Chemistry Revision Session')">🧪 Chemistry Revision Session</div>
+   <div class="room" id="Coding Bootcamp Discussion" onclick="joinRoom('Coding Bootcamp Discussion')">💻 Coding Bootcamp Discussion</div>
   </div>
 </div>
 
@@ -307,15 +307,16 @@
   });
 
   window.addEventListener("DOMContentLoaded", () => {
-    fetch('/api/rooms')
-      .then(response => response.json())
-      .then(data => {
-        const rooms = data.rooms;
-        for (const [roomId, roomData] of Object.entries(rooms)) {
-          addRoomToList(roomId, roomData.name);
-        }
-      });
-
+  fetch('/api/rooms')
+    .then(response => response.json())
+    .then(data => {
+      const rooms = data.rooms;
+      for (const [roomId, roomData] of Object.entries(rooms)) {
+        addRoomToList(roomId, roomData.name);
+      }
+    });
+   });
+   
     const bubbleContainer = document.getElementById("bubbleContainer");
     for (let i = 0; i < 30; i++) {
       const bubble = document.createElement("div");
@@ -333,7 +334,6 @@
     if (isDarkMode) {
       document.body.classList.add("dark-mode");
     }
-  });
 </script>
 
 </body>
