@@ -1,12 +1,14 @@
 <!-- room.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Room {{ room_id }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
     <header>
         <h1>Welcome to Study Room {{ room_id }}</h1>
@@ -17,7 +19,8 @@
     <section id="room-details">
         <h2>Room Details</h2>
         <p><strong>Room ID:</strong> {{ room_id }}</p>
-        <p><strong>Room Name:</strong> {{ rooms[room_id]["name"] if rooms and room_id in rooms else "Unnamed Room" }}</p>
+        <p><strong>Room Name:</strong> {{ rooms[room_id]["name"] if rooms and room_id in rooms else "Unnamed Room" }}
+        </p>
     </section>
 
     <section id="participants">
@@ -42,4 +45,5 @@
         }
     </script>
 </body>
+
 </html>

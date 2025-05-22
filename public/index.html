@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bubblemeet - Connect & Learn</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -18,18 +20,24 @@
       overflow-x: hidden;
       transition: background 0.3s, color 0.3s;
     }
+
     body.dark-mode {
       background: #121212;
       color: #e0e0e0;
     }
+
     .dark-mode .rooms-container {
       background: rgba(50, 50, 50, 0.9);
       color: #fff;
     }
-    .header, .hero, .rooms-container {
+
+    .header,
+    .hero,
+    .rooms-container {
       position: relative;
       z-index: 1;
     }
+
     .header {
       padding: 20px;
       font-size: 24px;
@@ -38,6 +46,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .dark-toggle {
       margin-right: 20px;
       padding: 10px 20px;
@@ -48,20 +57,25 @@
       cursor: pointer;
       font-size: 14px;
     }
+
     .hero {
       padding: 60px 20px;
     }
+
     .hero h1 {
       font-size: 48px;
       margin-bottom: 10px;
     }
+
     .hero p {
       font-size: 20px;
       margin-bottom: 20px;
     }
+
     .buttons {
       margin-top: 20px;
     }
+
     .buttons button {
       background: #ff5e62;
       color: white;
@@ -73,9 +87,11 @@
       margin: 10px;
       transition: 0.3s;
     }
+
     .buttons button:hover {
       background: #e14e53;
     }
+
     .rooms-container {
       margin-top: 40px;
       padding: 20px;
@@ -86,14 +102,17 @@
       margin-left: auto;
       margin-right: auto;
     }
+
     .room {
       padding: 15px;
       border-bottom: 1px solid #ddd;
       cursor: pointer;
     }
+
     .room:last-child {
       border-bottom: none;
     }
+
     .loading-container {
       display: none;
       position: fixed;
@@ -107,11 +126,13 @@
       flex-direction: column;
       z-index: 999;
     }
+
     .loading-text {
       font-size: 22px;
       font-weight: bold;
       margin-bottom: 15px;
     }
+
     .loader {
       border: 6px solid rgba(255, 255, 255, 0.3);
       border-top: 6px solid #ff5e62;
@@ -120,10 +141,17 @@
       height: 50px;
       animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
+
     .bubbles {
       position: fixed;
       top: 0;
@@ -134,60 +162,85 @@
       z-index: 0;
       overflow: hidden;
     }
+
     .bubble {
       position: absolute;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 50%;
       animation: float 30s infinite;
     }
+
     @keyframes float {
-      0% { transform: translate(0, 0) scale(1); opacity: 0.8; }
-      50% { transform: translate(-50px, -100px) scale(1.2); opacity: 1; }
-      100% { transform: translate(30px, 60px) scale(1); opacity: 0.8; }
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.8;
+      }
+
+      50% {
+        transform: translate(-50px, -100px) scale(1.2);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(30px, 60px) scale(1);
+        opacity: 0.8;
+      }
     }
+
     @media (max-width: 768px) {
       .header {
         flex-direction: column;
         gap: 10px;
         text-align: center;
       }
+
       .hero h1 {
         font-size: 32px;
       }
+
       .hero p {
         font-size: 16px;
       }
+
       .buttons button {
         width: 100%;
         max-width: 300px;
         font-size: 16px;
       }
+
       .rooms-container {
         padding: 15px;
         width: 90%;
         font-size: 16px;
       }
+
       .room {
         font-size: 16px;
       }
     }
+
     @media (max-width: 480px) {
       .hero {
         padding: 40px 15px;
       }
+
       .hero h1 {
         font-size: 26px;
       }
+
       .hero p {
         font-size: 14px;
       }
+
       .buttons button {
         padding: 12px 20px;
         font-size: 15px;
       }
+
       .header {
         font-size: 20px;
       }
+
       .dark-toggle {
         font-size: 12px;
         padding: 8px 16px;
@@ -195,128 +248,131 @@
     }
   </style>
 </head>
+
 <body>
 
-<div class="bubbles" id="bubbleContainer"></div>
+  <div class="bubbles" id="bubbleContainer"></div>
 
-<div class="header">
-  🎓 Bubblemeet - Your Virtual Study Hub
-  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
-</div>
-
-<div class="hero">
-  <h1>Connect. Learn. Succeed.</h1>
-  <p>Join study groups, collaborate with friends, and enhance your learning experience.</p>
-  <div class="buttons">
-    <button id="createBtn">➕ Create Study Room</button>
-    <button id="searchBtn">🔍 Search Study Room</button>    
+  <div class="header">
+    🎓 Bubblemeet - Your Virtual Study Hub
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
   </div>
-</div>
 
-<div class="rooms-container">
-  <h2>📌 Active Study Rooms</h2>
-  <div class="active rooms" id="roomList">
-   <div class="room" id="Math Study Group" onclick="joinRoom('Math Study Group')">📖 Math Study Group</div>
-   <div class="room" id="Chemistry Revision Session" onclick="joinRoom('Chemistry Revision Session')">🧪 Chemistry Revision Session</div>
-   <div class="room" id="Coding Bootcamp Discussion" onclick="joinRoom('Coding Bootcamp Discussion')">💻 Coding Bootcamp Discussion</div>
+  <div class="hero">
+    <h1>Connect. Learn. Succeed.</h1>
+    <p>Join study groups, collaborate with friends, and enhance your learning experience.</p>
+    <div class="buttons">
+      <button id="createBtn">➕ Create Study Room</button>
+      <button id="searchBtn">🔍 Search Study Room</button>
+    </div>
   </div>
-</div>
 
-<div class="loading-container" id="loadingScreen">
-  <div class="loading-text">Joining Room...</div>
-  <div class="loader"></div>
-</div>
+  <div class="rooms-container">
+    <h2>📌 Active Study Rooms</h2>
+    <div class="active rooms" id="roomList">
+      <div class="room" id="Math Study Group" onclick="joinRoom('Math Study Group')">📖 Math Study Group</div>
+      <div class="room" id="Chemistry Revision Session" onclick="joinRoom('Chemistry Revision Session')">🧪 Chemistry
+        Revision Session</div>
+      <div class="room" id="Coding Bootcamp Discussion" onclick="joinRoom('Coding Bootcamp Discussion')">💻 Coding
+        Bootcamp Discussion</div>
+    </div>
+  </div>
 
-<!-- External Libraries -->
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <div class="loading-container" id="loadingScreen">
+    <div class="loading-text">Joining Room...</div>
+    <div class="loader"></div>
+  </div>
 
-<!-- Main Script -->
-<script>
-  const socket = io();
-  const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
+  <!-- External Libraries -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
 
-  function getRandomEmoji() {
-    return studyEmojis[Math.floor(Math.random() * studyEmojis.length)];
-  }
+  <!-- Main Script -->
+  <script>
+    const socket = io();
+    const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
 
-  function createRoom() {
-    const roomName = prompt("Enter a name for the study room:");
-    if (!roomName) return;
+    function getRandomEmoji() {
+      return studyEmojis[Math.floor(Math.random() * studyEmojis.length)];
+    }
 
-    fetch('/api/create_room', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ room_name: roomName })
-    })
-    .then(response => response.json())
-    .then(data => {
-      const roomId = data.room_id;
-      const roomName = data.room_name;
-      addRoomToList(roomId, roomName);
-    });
-  }
+    function createRoom() {
+      const roomName = prompt("Enter a name for the study room:");
+      if (!roomName) return;
 
-  function addRoomToList(roomId, roomName) {
-    const roomList = document.getElementById("roomList");
-    const roomDiv = document.createElement("div");
-    roomDiv.className = "room";
-    roomDiv.id = roomId;
-    roomDiv.textContent = `${getRandomEmoji()} ${roomName}`;
-    roomDiv.onclick = () => joinRoom(roomId);
-    roomList.appendChild(roomDiv);
-  }
+      fetch('/api/create_room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_name: roomName })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const roomId = data.room_id;
+          const roomName = data.room_name;
+          addRoomToList(roomId, roomName);
+        });
+    }
 
-  function joinRoom(roomId) {
-    const username = prompt("Enter your name:");
-    if (!username) return;
-    localStorage.setItem("username", username);
-    window.location.href = `/meet/${roomId}?user=${encodeURIComponent(username)}`;
-  }
+    function addRoomToList(roomId, roomName) {
+      const roomList = document.getElementById("roomList");
+      const roomDiv = document.createElement("div");
+      roomDiv.className = "room";
+      roomDiv.id = roomId;
+      roomDiv.textContent = `${getRandomEmoji()} ${roomName}`;
+      roomDiv.onclick = () => joinRoom(roomId);
+      roomList.appendChild(roomDiv);
+    }
 
-  function toggleDarkMode() {
-    const body = document.body;
-    body.classList.toggle("dark-mode");
-    localStorage.setItem("darkMode", body.classList.contains("dark-mode"));
-  }
+    function joinRoom(roomId) {
+      const username = prompt("Enter your name:");
+      if (!username) return;
+      localStorage.setItem("username", username);
+      window.location.href = `/meet/${roomId}?user=${encodeURIComponent(username)}`;
+    }
 
-  document.getElementById("createBtn").addEventListener("click", createRoom);
+    function toggleDarkMode() {
+      const body = document.body;
+      body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", body.classList.contains("dark-mode"));
+    }
 
-  document.getElementById("searchBtn").addEventListener("click", function () {
-    const roomName = prompt("Enter the study room name:");
-    if (!roomName) return;
+    document.getElementById("createBtn").addEventListener("click", createRoom);
 
-    fetch('/api/rooms')
-      .then(response => response.json())
-      .then(data => {
-        const rooms = data.rooms;
-        const matchedRoom = Object.entries(rooms).find(([id, room]) =>
-          room.name.toLowerCase() === roomName.toLowerCase()
-        );
+    document.getElementById("searchBtn").addEventListener("click", function () {
+      const roomName = prompt("Enter the study room name:");
+      if (!roomName) return;
 
-        if (matchedRoom) {
-          const [roomId] = matchedRoom;
-          const userName = prompt("ROOM FOUND!!!Enter your name to join:");
-          if (userName) {
-            window.location.href = `/meet/${roomId}?user=${encodeURIComponent(userName)}`;
+      fetch('/api/rooms')
+        .then(response => response.json())
+        .then(data => {
+          const rooms = data.rooms;
+          const matchedRoom = Object.entries(rooms).find(([id, room]) =>
+            room.name.toLowerCase() === roomName.toLowerCase()
+          );
+
+          if (matchedRoom) {
+            const [roomId] = matchedRoom;
+            const userName = prompt("ROOM FOUND!!!Enter your name to join:");
+            if (userName) {
+              window.location.href = `/meet/${roomId}?user=${encodeURIComponent(userName)}`;
+            }
+          } else {
+            alert('Room not found!');
           }
-        } else {
-          alert('Room not found!');
-        }
-      });
-  });
-
-  window.addEventListener("DOMContentLoaded", () => {
-  fetch('/api/rooms')
-    .then(response => response.json())
-    .then(data => {
-      const rooms = data.rooms;
-      for (const [roomId, roomData] of Object.entries(rooms)) {
-        addRoomToList(roomId, roomData.name);
-      }
+        });
     });
-   });
-   
+
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch('/api/rooms')
+        .then(response => response.json())
+        .then(data => {
+          const rooms = data.rooms;
+          for (const [roomId, roomData] of Object.entries(rooms)) {
+            addRoomToList(roomId, roomData.name);
+          }
+        });
+    });
+
     const bubbleContainer = document.getElementById("bubbleContainer");
     for (let i = 0; i < 30; i++) {
       const bubble = document.createElement("div");
@@ -334,7 +390,8 @@
     if (isDarkMode) {
       document.body.classList.add("dark-mode");
     }
-</script>
+  </script>
 
 </body>
+
 </html>

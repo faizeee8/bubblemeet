@@ -1,104 +1,109 @@
 <!-- rooms.html -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Active Study Rooms</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Study Rooms</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
-    <header>
-        <h1>Active Study Rooms</h1>
-        <a href="{{ url_for('index') }}">← Back to Home</a>
-    </header>
+  <header>
+    <h1>Active Study Rooms</h1>
+    <a href="{{ url_for('index') }}">← Back to Home</a>
+  </header>
 
-    <div class="rooms-container">
-        <h2>📌 Active Study Rooms</h2>
+  <div class="rooms-container">
+    <h2>📌 Active Study Rooms</h2>
 
-        <!-- Search Bar -->
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search study room by name">
-            <button id="searchButton">Search</button>
-        </div>
-
-        <div id="roomList">
-          {% if rooms %}
-            {% for room_id, room_data in rooms.items() %}
-            <div class="room" data-room-name="{{ room_data.name | lower }}" onclick="joinRoom('{{ room_id }}')">
-                {{ room_data.name }}
-            </div>                            
-            {% endfor %}
-          {% else %}
-            <p>No active rooms available.</p>
-          {% endif %}
-        </div>
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search study room by name">
+      <button id="searchButton">Search</button>
     </div>
 
+    <div id="roomList">
+      {% if rooms %}
+      {% for room_id, room_data in rooms.items() %}
+      <div class="room" data-room-name="{{ room_data.name | lower }}" onclick="joinRoom('{{ room_id }}')">
+        {{ room_data.name }}
+      </div>
+      {% endfor %}
+      {% else %}
+      <p>No active rooms available.</p>
+      {% endif %}
+    </div>
+  </div>
 
-    <script>
-        function joinRoom(roomId) {
-        const userName = prompt("Give yourself a name:");
-        if (userName && userName.trim() !== "") {
+
+  <script>
+    function joinRoom(roomId) {
+      const userName = prompt("Give yourself a name:");
+      if (userName && userName.trim() !== "") {
         window.location.href = `/meet/${roomId}?username=${encodeURIComponent(userName.trim())}`;
-       }
-     }
-
-        document.addEventListener('DOMContentLoaded', function () {
-     const searchButton = document.getElementById('searchButton');
-     searchButton.addEventListener('click', function () {
-     const input = document.getElementById('searchInput').value.trim().toLowerCase();
-     const rooms = document.querySelectorAll('.room');
-     let found = false;
-
-     rooms.forEach(room => {
-      room.classList.remove('highlight');
-      const roomName = room.getAttribute('data-room-name');
-      if (roomName === input) {
-        room.classList.add('highlight');
-        room.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        found = true;
       }
-     });
+    }
 
-     if (!found) {
-      alert('No study room found with that name.');
-      }
+    document.addEventListener('DOMContentLoaded', function () {
+      const searchButton = document.getElementById('searchButton');
+      searchButton.addEventListener('click', function () {
+        const input = document.getElementById('searchInput').value.trim().toLowerCase();
+        const rooms = document.querySelectorAll('.room');
+        let found = false;
+
+        rooms.forEach(room => {
+          room.classList.remove('highlight');
+          const roomName = room.getAttribute('data-room-name');
+          if (roomName === input) {
+            room.classList.add('highlight');
+            room.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            found = true;
+          }
+        });
+
+        if (!found) {
+          alert('No study room found with that name.');
+        }
       });
-     });
-    </script>
+    });
+  </script>
 
-    <style>
-        .highlight {
-     background-color: #ffd54f;
-     border: 2px solid #ff9800;
-     }
-        .search-container {
-            margin-bottom: 15px;
-        }
+  <style>
+    .highlight {
+      background-color: #ffd54f;
+      border: 2px solid #ff9800;
+    }
 
-        .search-container input {
-            padding: 8px;
-            width: 200px;
-            font-size: 14px;
-        }
+    .search-container {
+      margin-bottom: 15px;
+    }
 
-        .search-container button {
-            padding: 8px 12px;
-            font-size: 14px;
-            cursor: pointer;
-        }
+    .search-container input {
+      padding: 8px;
+      width: 200px;
+      font-size: 14px;
+    }
 
-        .highlight {
-            background-color: #ffd54f;
-            border: 2px solid #ff9800;
-        }
-    </style>
+    .search-container button {
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .highlight {
+      background-color: #ffd54f;
+      border: 2px solid #ff9800;
+    }
+  </style>
 </body>
+
 </html>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,16 +114,19 @@
       background-color: #ffff99 !important;
       border: 2px solid #f0c000;
     }
+
     .search-container {
       margin: 20px 0;
       text-align: center;
     }
+
     .search-container input {
       padding: 8px;
       width: 200px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
     .search-container button {
       padding: 8px 12px;
       margin-left: 6px;
@@ -128,11 +136,13 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
     .search-container button:hover {
       background-color: #45a049;
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Active Study Rooms</h1>
@@ -150,13 +160,13 @@
 
     <div id="roomList">
       {% if rooms %}
-        {% for room_id, room_data in rooms.items() %}
-          <div class="room" onclick="joinRoom('{{ room_id }}')" data-room-name="{{ room_data.name|lower }}">
-            {{ room_data.name }}
-          </div>
-        {% endfor %}
+      {% for room_id, room_data in rooms.items() %}
+      <div class="room" onclick="joinRoom('{{ room_id }}')" data-room-name="{{ room_data.name|lower }}">
+        {{ room_data.name }}
+      </div>
+      {% endfor %}
       {% else %}
-        <p>No active rooms available.</p>
+      <p>No active rooms available.</p>
       {% endif %}
     </div>
   </div>
@@ -187,4 +197,5 @@
     }
   </script>
 </body>
+
 </html>
