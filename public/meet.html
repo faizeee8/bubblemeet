@@ -272,13 +272,20 @@
     }
 
     window.onload = () => {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true
+        }
+      }).then(stream => {
         document.getElementById('loading-screen').style.display = 'none';
         localStream = stream;
-        addVideoStream(createVideoElement(), stream, userName);
+        const myVideo = createVideoElement();
+        myVideo.muted = true; // Mute local video to prevent echo
+        addVideoStream(myVideo, stream, userName);
 
         peer.on('call', call => {
-          if (call.peer === peer.id) return; // Echo fix
           call.answer(stream);
           const video = createVideoElement();
           call.on('stream', remoteStream => {
@@ -303,7 +310,6 @@
           }
         });
 
-
         socket.on('user-connected', ({ peerId, userName: remoteName }) => {
           showToast(`${remoteName} joined the room`);
           const call = peer.call(peerId, stream, { metadata: { userName } });
@@ -314,7 +320,6 @@
           call.on('close', () => video.parentElement.remove());
           peers[peerId] = call;
         });
-
 
         socket.on('user-disconnected', peerId => {
           if (peers[peerId]) peers[peerId].close();
@@ -377,58 +382,58 @@
           screenVideo.parentElement.remove();
           screenSharingUser = null;
         };
-      } catch (err) { }
+      } catch (err) {
+        console.error('Screen sharing failed:', err);
+      }
+    };
+
+    document.getElementById('fullscreenBtn').onclick = () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    };
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
     }
 
-      document.getElementById('fullscreenBtn').onclick = () => {
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-        else document.exitFullscreen();
-      };
+    function leaveMeeting() {
+      window.location.href = "/";
+    }
 
-      function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
+    minimizeChatBtn.onclick = () => {
+      chatBox.classList.toggle('collapsed');
+      removeRedDot();
+    };
+
+    function showRedDot() {
+      if (!document.querySelector('.red-dot')) {
+        const dot = document.createElement('span');
+        dot.className = 'red-dot';
+        minimizeChatBtn.appendChild(dot);
       }
+    }
 
-      function leaveMeeting() {
-        window.location.href = "/";
+    function removeRedDot() {
+      const dot = document.querySelector('.red-dot');
+      if (dot) dot.remove();
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const msg = input.value.trim();
+      if (msg) {
+        const div = document.createElement('div');
+        div.textContent = `${userName}: ${msg}`;
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        socket.emit('chat-message', { user: userName, message: msg });
+        input.value = "";
       }
+    }
 
-      minimizeChatBtn.onclick = () => {
-        chatBox.classList.toggle('collapsed');
-        removeRedDot();
-      };
-
-      function showRedDot() {
-        if (!document.querySelector('.red-dot')) {
-          const dot = document.createElement('span');
-          dot.className = 'red-dot';
-          minimizeChatBtn.appendChild(dot);
-        }
-      }
-
-      function removeRedDot() {
-        const dot = document.querySelector('.red-dot');
-        if (dot) dot.remove();
-      }
-
-      function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const msg = input.value.trim();
-        if (msg) {
-          const div = document.createElement('div');
-          div.textContent = `${userName}: ${msg}`;
-
-          messagesContainer.appendChild(div);
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-          socket.emit('chat-message', { user: userName, message: msg });
-          input.value = "";
-        }
-      }
-
-
-      document.getElementById('messageInput').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') sendMessage();
-      });
+    document.getElementById('messageInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') sendMessage();
+    });
   </script>
 </body>
 </html>
