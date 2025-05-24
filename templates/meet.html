@@ -276,56 +276,59 @@
         video: true,
         audio: {
           echoCancellation: true,
-          noiseSuppression: true
+          noiseSuppression: true,
+          autoGainControl: true,
+          latency: 0
         }
-      }).then(stream => {
-        document.getElementById('loading-screen').style.display = 'none';
-        localStream = stream;
-        const myVideo = createVideoElement();
-        myVideo.muted = true; // Mute local video to prevent echo
-        addVideoStream(myVideo, stream, userName);
+      })
+        .then(stream => {
+          document.getElementById('loading-screen').style.display = 'none';
+          localStream = stream;
+          const myVideo = createVideoElement();
+          myVideo.muted = true; // Mute local video to prevent echo
+          addVideoStream(myVideo, stream, userName);
 
-        peer.on('call', call => {
-          call.answer(stream);
-          const video = createVideoElement();
-          call.on('stream', remoteStream => {
-            addVideoStream(video, remoteStream, call.metadata?.userName || "Peer");
+          peer.on('call', call => {
+            call.answer(stream);
+            const video = createVideoElement();
+            call.on('stream', remoteStream => {
+              addVideoStream(video, remoteStream, call.metadata?.userName || "Peer");
+            });
+            call.on('close', () => video.parentElement.remove());
+            peers[call.peer] = call;
           });
-          call.on('close', () => video.parentElement.remove());
-          peers[call.peer] = call;
-        });
 
-        peer.on('open', id => {
-          socket.emit('join-room', { roomName, peerId: id, userName });
-        });
-
-        socket.on('chat-message', data => {
-          const div = document.createElement('div');
-          div.textContent = `${data.user}: ${data.message}`;
-          messagesContainer.appendChild(div);
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-          showToast(`${data.user} says: ${data.message}`);
-          if (chatBox.classList.contains('collapsed')) {
-            showRedDot();
-          }
-        });
-
-        socket.on('user-connected', ({ peerId, userName: remoteName }) => {
-          showToast(`${remoteName} joined the room`);
-          const call = peer.call(peerId, stream, { metadata: { userName } });
-          const video = createVideoElement();
-          call.on('stream', remoteStream => {
-            addVideoStream(video, remoteStream, remoteName);
+          peer.on('open', id => {
+            socket.emit('join-room', { roomName, peerId: id, userName });
           });
-          call.on('close', () => video.parentElement.remove());
-          peers[peerId] = call;
-        });
 
-        socket.on('user-disconnected', peerId => {
-          if (peers[peerId]) peers[peerId].close();
-          showToast("A user left the room");
+          socket.on('chat-message', data => {
+            const div = document.createElement('div');
+            div.textContent = `${data.user}: ${data.message}`;
+            messagesContainer.appendChild(div);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            showToast(`${data.user} says: ${data.message}`);
+            if (chatBox.classList.contains('collapsed')) {
+              showRedDot();
+            }
+          });
+
+          socket.on('user-connected', ({ peerId, userName: remoteName }) => {
+            showToast(`${remoteName} joined the room`);
+            const call = peer.call(peerId, stream, { metadata: { userName } });
+            const video = createVideoElement();
+            call.on('stream', remoteStream => {
+              addVideoStream(video, remoteStream, remoteName);
+            });
+            call.on('close', () => video.parentElement.remove());
+            peers[peerId] = call;
+          });
+
+          socket.on('user-disconnected', peerId => {
+            if (peers[peerId]) peers[peerId].close();
+            showToast("A user left the room");
+          });
         });
-      });
     };
 
     function createVideoElement() {

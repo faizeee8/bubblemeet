@@ -1,0 +1,96 @@
+<!-- rooms.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Study Rooms</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script type="module">
+    // Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDj-TAPE3f-35Q73Voe067Zxo73x1e4_eA",
+      authDomain: "bubblemeet-e6d83.firebaseapp.com",
+      projectId: "bubblemeet-e6d83",
+      storageBucket: "bubblemeet-e6d83.firebasestorage.app",
+      messagingSenderId: "28744432918",
+      appId: "1:28744432918:web:5c4d58acb77cb5348a2437",
+      measurementId: "G-EJB8RD6HTL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const roomList = document.getElementById("roomList");
+
+    function renderRoom(doc) {
+      const div = document.createElement("div");
+      div.className = "room";
+      div.textContent = doc.data().name;
+      div.setAttribute("data-room-name", doc.data().name.toLowerCase());
+      div.onclick = () => joinRoom(doc.id);
+      roomList.appendChild(div);
+    }
+
+    function clearRooms() {
+      roomList.innerHTML = "";
+    }
+
+    function listenToRooms() {
+      const roomsRef = collection(db, "rooms");
+      onSnapshot(roomsRef, (snapshot) => {
+        clearRooms();
+        if (snapshot.empty) {
+          roomList.innerHTML = "<p>No active rooms available.</p>";
+        } else {
+          snapshot.forEach(renderRoom);
+        }
+      });
+    }
+
+    window.joinRoom = function (roomId) {
+      const userName = prompt("Give yourself a name:");
+      if (userName && userName.trim() !== "") {
+        window.location.href = `/meet/${roomId}?username=${encodeURIComponent(userName.trim())}`;
+      }
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+      listenToRooms();
+      document.getElementById('searchButton').addEventListener('click', function () {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const rooms = document.querySelectorAll('.room');
+        rooms.forEach(room => {
+          const name = room.getAttribute('data-room-name');
+          room.style.display = name.includes(query) ? 'block' : 'none';
+        });
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <header>
+    <h1>Active Study Rooms</h1>
+    <a href="/">← Back to Home</a>
+  </header>
+
+  <div class="rooms-container">
+    <h2>📌 Active Study Rooms</h2>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search study room by name">
+      <button id="searchButton">Search</button>
+    </div>
+
+    <div id="roomList">
+      <p>Loading rooms...</p>
+    </div>
+  </div>
+</body>
+
+</html>

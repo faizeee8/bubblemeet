@@ -3,11 +3,11 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, join_room, emit
 import uuid
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')  # Force threading to avoid port binding issues
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# In-memory room store
+# In-memory store for active rooms
 active_rooms = {}
 
 # ----- Routes -----
@@ -18,11 +18,12 @@ def index():
 
 @app.route('/rooms')
 def rooms():
-    return render_template('rooms.html', rooms=active_rooms)
+    # Firebase handles live room display, so no need to send room data from Flask
+    return render_template('rooms.html')
 
 @app.route('/meet/<room_id>')
 def meet(room_id):
-    user_name = request.args.get('user', 'Guest')
+    user_name = request.args.get('username', 'Guest')
     room_name = active_rooms.get(room_id, {}).get('name', 'Bubblemeet')
     return render_template('meet.html', room_id=room_id, user_name=user_name, room_name=room_name)
 
@@ -44,7 +45,6 @@ def create_room():
 def get_rooms():
     return jsonify({"rooms": active_rooms})
 
-
 # ----- Socket.IO Events -----
 
 @socketio.on('join-room')
@@ -63,8 +63,7 @@ def handle_disconnect():
 def handle_chat(data):
     emit('chat-message', data, room=data['roomName'])
 
-
 # ----- Run Server -----
 if __name__ == '__main__':
-    print("Server is running at http://localhost:5000")
+    print("Server running at http://localhost:5050")
     socketio.run(app, debug=True, port=5050)
