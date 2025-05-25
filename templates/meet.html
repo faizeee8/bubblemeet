@@ -377,7 +377,7 @@
         return;
       }
       try {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true,audio: false });
         screenSharingUser = userName;
         const screenVideo = createVideoElement();
         addVideoStream(screenVideo, screenStream, `${userName} (Screen)`);
