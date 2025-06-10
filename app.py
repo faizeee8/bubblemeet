@@ -63,7 +63,12 @@ def handle_disconnect():
 def handle_chat(data):
     emit('chat-message', data, room=data['roomName'])
 
-# ----- Run Server -----
+@socketio.on('send-reaction')
+def handle_reaction(data):
+    room = data.get('room')
+    emit('receive-reaction', data, broadcast=True, include_self=False)
+
+# ---- Run Server ----
 if __name__ == '__main__':
     print("Server running at http://localhost:5050")
     socketio.run(app, debug=True, port=5050)
