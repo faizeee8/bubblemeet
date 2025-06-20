@@ -5,12 +5,14 @@ import uuid
 import json
 import firebase_admin
 from firebase_admin import credentials, firestore
+from firebase_setup import initialize_firebase
 import os
 
 # Load Firebase service account from environment variable
 firebase_creds = json.loads(os.environ['FIREBASE_CREDS_JSON'])
 cred = credentials.Certificate(firebase_creds)
 firebase_admin.initialize_app(cred)
+initialize_firebase()
 db = firestore.client()
 
 

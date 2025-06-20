@@ -360,7 +360,7 @@
             const [roomId] = matchedRoom;
             const userName = prompt("ROOM FOUND!!! Enter your name to join:");
             if (userName) {
-              window.location.href = `/meet/${roomId}?user=${encodeURIComponent(userName)}`;
+              window.location.href = `/meet/${roomId}?username=${encodeURIComponent(username)}`;
             }
           } else {
             alert('Room not found!');
