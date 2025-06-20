@@ -18,8 +18,6 @@ app = Flask(__name__, template_folder='templates')
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# In-memory store for active rooms
-active_rooms = {}
 
 # ----- Routes -----
 
@@ -64,7 +62,12 @@ def create_room():
 
 @app.route('/api/rooms', methods=['GET'])
 def get_rooms():
-    return jsonify({"rooms": active_rooms})
+    rooms_ref = db.collection('rooms').stream()
+    rooms = {}
+    for doc in rooms_ref:
+        rooms[doc.id] = doc.to_dict()
+    return jsonify({"rooms": rooms})
+
 
 # ----- Socket.IO Events -----
 
