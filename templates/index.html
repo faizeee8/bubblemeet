@@ -300,11 +300,14 @@
       const roomName = prompt("Enter a name for the study room:");
       if (!roomName) return;
 
-      fetch('/api/create_room', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ room_name: roomName })
-      })
+      fetch("https://bubblemeet-hr3u.onrender.com/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ room_name: yourRoomName })
+      });
+
         .then(response => response.json())
         .then(data => {
           const roomId = data.room_id;

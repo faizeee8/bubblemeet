@@ -2,6 +2,17 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, join_room, emit
 import uuid
+import json
+import firebase_admin
+from firebase_admin import credentials, firestore
+import os
+
+# Load Firebase service account from environment variable
+firebase_creds = json.loads(os.environ['FIREBASE_CREDS_JSON'])
+cred = credentials.Certificate(firebase_creds)
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
 
 app = Flask(__name__, template_folder='templates')
 CORS(app)
@@ -38,8 +49,18 @@ def create_room():
     data = request.get_json()
     room_name = data.get('room_name', 'Untitled Room')
     room_id = str(uuid.uuid4())[:8]
+
+    # Save to in-memory dict
     active_rooms[room_id] = {"name": room_name}
+
+    # Save to Firestore
+    db.collection('rooms').document(room_id).set({
+        'name': room_name
+    })
+
     return jsonify({'room_id': room_id, 'room_name': room_name})
+
+
 
 @app.route('/api/rooms', methods=['GET'])
 def get_rooms():
