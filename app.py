@@ -18,7 +18,8 @@ db = firestore.client()
 
 app = Flask(__name__, template_folder='templates')
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 
 
 # ----- Routes -----
