@@ -289,7 +289,9 @@
 
   <!-- Main Script -->
   <script>
-    const socket = io();
+    const BACKEND_URL = 'https://bubblemeet-hr3u.onrender.com/'; // <-- Replace with your actual backend URL
+
+    const socket = io(BACKEND_URL);
     const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
 
     function getRandomEmoji() {
@@ -300,19 +302,20 @@
       const roomName = prompt("Enter a name for the study room:");
       if (!roomName) return;
 
-      fetch("https://bubblemeet-hr3u.onrender.com/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ room_name: yourRoomName })
-      });
-
+      fetch(`${BACKEND_URL}https://bubblemeet-hr3u.onrender.com/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_name: roomName })
+      })
         .then(response => response.json())
         .then(data => {
           const roomId = data.room_id;
           const roomName = data.room_name;
           addRoomToList(roomId, roomName);
+        })
+        .catch(err => {
+          alert("Failed to create room. Please try again later.");
+          console.error(err);
         });
     }
 
@@ -345,7 +348,7 @@
       const roomName = prompt("Enter the study room name:");
       if (!roomName) return;
 
-      fetch('/api/rooms')
+      fetch(`${BACKEND_URL}https://bubblemeet-hr3u.onrender.com`)
         .then(response => response.json())
         .then(data => {
           const rooms = data.rooms;
@@ -355,7 +358,7 @@
 
           if (matchedRoom) {
             const [roomId] = matchedRoom;
-            const userName = prompt("ROOM FOUND!!!Enter your name to join:");
+            const userName = prompt("ROOM FOUND!!! Enter your name to join:");
             if (userName) {
               window.location.href = `/meet/${roomId}?user=${encodeURIComponent(userName)}`;
             }
@@ -366,7 +369,7 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
-      fetch('/api/rooms')
+      fetch(`${BACKEND_URL}https://bubblemeet-hr3u.onrender.com`)
         .then(response => response.json())
         .then(data => {
           const rooms = data.rooms;
@@ -394,6 +397,7 @@
       document.body.classList.add("dark-mode");
     }
   </script>
+
 
 </body>
 
