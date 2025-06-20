@@ -21,7 +21,6 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-
 # ----- Routes -----
 
 @app.route('/')
