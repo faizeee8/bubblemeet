@@ -33,14 +33,13 @@ def rooms():
 @app.route('/meet/<room_id>')
 def meet(room_id):
     user_name = request.args.get('username', 'Guest')
-    room_name = active_rooms.get(room_id, {}).get('name', 'Bubblemeet')
+
+    # Fetch room name from Firestore instead of active_rooms
+    doc = db.collection('rooms').document(room_id).get()
+    room_name = doc.to_dict().get('name', 'Bubblemeet') if doc.exists else 'Bubblemeet'
+
     return render_template('meet.html', room_id=room_id, user_name=user_name, room_name=room_name)
 
-@app.route('/room/<room_id>')
-def room_preview(room_id):
-    if room_id not in active_rooms:
-        return "Room not found", 404
-    return render_template('room.html', room_id=room_id, rooms=active_rooms)
 
 @app.route('/api/create_room', methods=['POST'])
 def create_room():
@@ -48,10 +47,7 @@ def create_room():
     room_name = data.get('room_name', 'Untitled Room')
     room_id = str(uuid.uuid4())[:8]
 
-    # Save to in-memory dict
-    active_rooms[room_id] = {"name": room_name}
-
-    # Save to Firestore
+    # Save to Firestore only
     db.collection('rooms').document(room_id).set({
         'name': room_name
     })
