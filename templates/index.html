@@ -289,7 +289,7 @@
 
   <!-- Main Script -->
   <script>
-    const BACKEND_URL = 'https://bubblemeet-hr3u.onrender.com/';
+    const BACKEND_URL = 'https://bubblemeet-hr3u.onrender.com/'; 
 
     const socket = io(BACKEND_URL);
     const studyEmojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"];
@@ -302,21 +302,21 @@
       const roomName = prompt("Enter a name for the study room:");
       if (!roomName) return;
 
-      fetch(`${BACKEND_URL}`, {
+      fetch(`${BACKEND_URL}api/create_room`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ room_name: roomName })
       })
-      .then(response => response.json())
-      .then(data => {
-        const roomId = data.room_id;
-        const roomName = data.room_name;
-        addRoomToList(roomId, roomName);
-      })
-      .catch(err => {
-        alert("Failed to create room. Please try again later.");
-        console.error(err);
-      });
+        .then(response => response.json())
+        .then(data => {
+          const roomId = data.room_id;
+          const roomName = data.room_name;
+          addRoomToList(roomId, roomName);
+        })
+        .catch(err => {
+          alert("Failed to create room. Please try again later.");
+          console.error(err);
+        });
     }
 
     function addRoomToList(roomId, roomName) {
@@ -348,7 +348,7 @@
       const roomName = prompt("Enter the study room name:");
       if (!roomName) return;
 
-      fetch(`${BACKEND_URL}`)
+      fetch(`${BACKEND_URL}api/rooms`)
         .then(response => response.json())
         .then(data => {
           const rooms = data.rooms;
@@ -369,7 +369,7 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
-      fetch(`${BACKEND_URL}`)
+      fetch(`${BACKEND_URL}api/rooms`)
         .then(response => response.json())
         .then(data => {
           const rooms = data.rooms;
@@ -395,7 +395,7 @@
     const isDarkMode = localStorage.getItem("darkMode") === "true";
     if (isDarkMode) {
       document.body.classList.add("dark-mode");
-    }
+    } 
   </script>
 
 
