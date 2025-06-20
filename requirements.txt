@@ -2,5 +2,5 @@ Flask==2.3.2
 gunicorn==20.1.0
 flask-cors==6.0.1
 flask-socketio==5.3.4
-eventlet==0.33.1
-dnspython==2.6.1  # ⬅️ downgrade this manually
+eventlet==0.33.0  # ← 🔥 THIS FIXES THE ERROR!
+dnspython==2.6.1
