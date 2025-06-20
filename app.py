@@ -68,6 +68,7 @@ def handle_reaction(data):
     room = data.get('room')
     emit('receive-reaction', data, broadcast=True, include_self=False)
 
+
 # ---- Run Server ----
 if __name__ == '__main__':
     print("Server running at http://localhost:5050")
