@@ -334,7 +334,7 @@
       const username = prompt("Enter your name:");
       if (!username) return;
       localStorage.setItem("username", username);
-      window.location.href = `/meet/${roomId}?user=${encodeURIComponent(username)}`;
+      window.location.href = `/meet/${roomId}?username=${encodeURIComponent(username)}`;
     }
 
     function toggleDarkMode() {
