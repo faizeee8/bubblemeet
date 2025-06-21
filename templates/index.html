@@ -319,15 +319,16 @@
         });
     }
 
-    function addRoomToList(roomId, roomName) {
+    function addRoomToList(roomId, roomName, emoji = "📚") {
       const roomList = document.getElementById("roomList");
       const roomDiv = document.createElement("div");
       roomDiv.className = "room";
       roomDiv.id = roomId;
-      roomDiv.textContent = `${getRandomEmoji()} ${roomName}`;
+      roomDiv.textContent = `${emoji} ${roomName}`;
       roomDiv.onclick = () => joinRoom(roomId);
       roomList.appendChild(roomDiv);
     }
+
 
     function joinRoom(roomId) {
       const username = prompt("Enter your name:");
@@ -374,8 +375,8 @@
         .then(data => {
           const rooms = data.rooms;
           for (const [roomId, roomData] of Object.entries(rooms)) {
-            if (roomData.name) { // ✅ Only add rooms that have a name
-              addRoomToList(roomId, roomData.name);
+            if (roomData.name) {
+              addRoomToList(roomId, roomData.name, roomData.emoji);
             }
           }
         });

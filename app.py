@@ -90,11 +90,6 @@ def handle_reaction(data):
     room = data.get('room')
     emit('receive-reaction', data, broadcast=True, include_self=False)
 
-socketio = SocketIO(app, cors_allowed_origins="*")
-
-
-import os
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     socketio.run(app, host='0.0.0.0', port=port)
