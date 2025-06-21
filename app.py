@@ -16,13 +16,13 @@ firebase_admin.initialize_app(cred)
 initialize_firebase()
 db = firestore.client()
 
-
 app = Flask(__name__, template_folder='templates')
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
 
+# ✅ Use gevent async_mode explicitly
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
 
-# ----- Routes -----
+# ---------- ROUTES ----------
 
 @app.route('/')
 def index():
@@ -30,38 +30,27 @@ def index():
 
 @app.route('/rooms')
 def rooms():
-    # Firebase handles live room display, so no need to send room data from Flask
     return render_template('rooms.html')
 
 @app.route('/meet/<room_id>')
 def meet(room_id):
     user_name = request.args.get('username', 'Guest')
-
-    # Fetch room name from Firestore instead of active_rooms
     doc = db.collection('rooms').document(room_id).get()
     room_name = doc.to_dict().get('name', 'Bubblemeet') if doc.exists else 'Bubblemeet'
-
     return render_template('meet.html', room_id=room_id, user_name=user_name, room_name=room_name)
-
 
 @app.route('/api/create_room', methods=['POST'])
 def create_room():
     data = request.get_json()
     room_name = data.get('room_name', 'Untitled Room')
     room_id = str(uuid.uuid4())[:8]
-
-    # 🎯 Pick a random emoji for the room
     emojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"]
     emoji = random.choice(emojis)
-
-    # ✅ Save to Firestore with name + emoji
     db.collection('rooms').document(room_id).set({
         'name': room_name,
         'emoji': emoji
     })
-
     return jsonify({'room_id': room_id, 'room_name': room_name, 'emoji': emoji})
-
 
 @app.route('/api/rooms', methods=['GET'])
 def get_rooms():
@@ -71,17 +60,17 @@ def get_rooms():
         rooms[doc.id] = doc.to_dict()
     return jsonify({"rooms": rooms})
 
-
-# ----- Socket.IO Events -----
+# ---------- SOCKET.IO EVENTS ----------
 
 @socketio.on('join-room')
 def handle_join(data):
-    print("JOIN-ROOM received:", data)  # DEBUG
-    join_room(data['roomName'])
+    print("JOIN-ROOM received:", data)
+    room_id = data['roomId']  # 🔁 roomId instead of roomName
+    join_room(room_id)
     emit('user-connected', {
         'peerId': data['peerId'],
         'userName': data['userName']
-    }, room=data['roomName'], include_self=False)
+    }, room=room_id, include_self=False)
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -89,12 +78,13 @@ def handle_disconnect():
 
 @socketio.on('chat-message')
 def handle_chat(data):
-    emit('chat-message', data, room=data['roomId'])  # <- updated
+    emit('chat-message', data, room=data['roomId'])
 
 @socketio.on('send-reaction')
 def handle_reaction(data):
-    room = data.get('room')
-    emit('receive-reaction', data, broadcast=True, include_self=False)
+    emit('receive-reaction', data, room=data.get('room'))
+
+# ---------- RUN ----------
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
