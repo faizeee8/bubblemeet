@@ -76,6 +76,7 @@ def get_rooms():
 
 @socketio.on('join-room')
 def handle_join(data):
+    print("JOIN-ROOM received:", data)  # DEBUG
     join_room(data['roomName'])
     emit('user-connected', {
         'peerId': data['peerId'],

@@ -271,9 +271,7 @@
   </select>
 
   <div id="toast-container"></div>
-
   <h2 style="margin-top: 10px;">Bubblemeet Room: {{ room_name }}</h2>
-
   <div class="video-container" id="video-container"></div>
 
   <div class="controls">
@@ -300,7 +298,7 @@
     const socket = io("https://bubblemeet-hr3u.onrender.com/");
     const peer = new Peer();
 
-    const roomId = "{{ room_id }}"; 
+    const roomId = "{{ room_id }}"; // This stays, and is used in JS from now on
     const userName = prompt("Enter your name") || "Anonymous";
 
     const videoContainer = document.getElementById('video-container');
@@ -330,55 +328,54 @@
           autoGainControl: true,
           latency: 0
         }
-      })
-        .then(stream => {
-          document.getElementById('loading-screen').style.display = 'none';
-          localStream = stream;
-          const myVideo = createVideoElement();
-          myVideo.muted = true; // Mute local video to prevent echo
-          addVideoStream(myVideo, stream, userName);
+      }).then(stream => {
+        document.getElementById('loading-screen').style.display = 'none';
+        localStream = stream;
+        const myVideo = createVideoElement();
+        myVideo.muted = true;
+        addVideoStream(myVideo, stream, userName);
 
-          peer.on('call', call => {
-            call.answer(stream);
-            const video = createVideoElement();
-            call.on('stream', remoteStream => {
-              addVideoStream(video, remoteStream, call.metadata?.userName || "Peer");
-            });
-            call.on('close', () => video.parentElement.remove());
-            peers[call.peer] = call;
+        peer.on('call', call => {
+          call.answer(stream);
+          const video = createVideoElement();
+          call.on('stream', remoteStream => {
+            addVideoStream(video, remoteStream, call.metadata?.userName || "Peer");
           });
-
-          peer.on('open', id => {
-            socket.emit('join-room', { roomName: room_id , peerId: id, userName });
-          });
-
-          socket.on('chat-message', data => {
-            const div = document.createElement('div');
-            div.textContent = `${data.user}: ${data.message}`;
-            messagesContainer.appendChild(div);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            showToast(`${data.user} says: ${data.message}`);
-            if (chatBox.classList.contains('collapsed')) {
-              showRedDot();
-            }
-          });
-
-          socket.on('user-connected', ({ peerId, userName: remoteName }) => {
-            showToast(`${remoteName} joined the room`);
-            const call = peer.call(peerId, stream, { metadata: { userName } });
-            const video = createVideoElement();
-            call.on('stream', remoteStream => {
-              addVideoStream(video, remoteStream, remoteName);
-            });
-            call.on('close', () => video.parentElement.remove());
-            peers[peerId] = call;
-          });
-
-          socket.on('user-disconnected', peerId => {
-            if (peers[peerId]) peers[peerId].close();
-            showToast("A user left the room");
-          });
+          call.on('close', () => video.parentElement.remove());
+          peers[call.peer] = call;
         });
+
+        peer.on('open', id => {
+          socket.emit('join-room', { roomName: roomId, peerId: id, userName });
+        });
+
+        socket.on('chat-message', data => {
+          const div = document.createElement('div');
+          div.textContent = `${data.user}: ${data.message}`;
+          messagesContainer.appendChild(div);
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          showToast(`${data.user} says: ${data.message}`);
+          if (chatBox.classList.contains('collapsed')) {
+            showRedDot();
+          }
+        });
+
+        socket.on('user-connected', ({ peerId, userName: remoteName }) => {
+          showToast(`${remoteName} joined the room`);
+          const call = peer.call(peerId, stream, { metadata: { userName } });
+          const video = createVideoElement();
+          call.on('stream', remoteStream => {
+            addVideoStream(video, remoteStream, remoteName);
+          });
+          call.on('close', () => video.parentElement.remove());
+          peers[peerId] = call;
+        });
+
+        socket.on('user-disconnected', peerId => {
+          if (peers[peerId]) peers[peerId].close();
+          showToast("A user left the room");
+        });
+      });
     };
 
     function createVideoElement() {
@@ -479,7 +476,7 @@
         div.textContent = `${userName}: ${msg}`;
         messagesContainer.appendChild(div);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        socket.emit('chat-message', { room: room_id , user: userName, message: msg });
+        socket.emit('chat-message', { room: roomId, user: userName, message: msg });
         input.value = "";
       }
     }
@@ -489,7 +486,7 @@
     });
 
     function sendReaction(emoji) {
-      socket.emit('send-reaction', { room: "{{ room_id }}", emoji, user: userName });
+      socket.emit('send-reaction', { room: roomId, emoji, user: userName });
       showFloatingEmoji(emoji);
     }
 
@@ -513,10 +510,10 @@
     });
 
     const themeBackgrounds = {
-      library: "url('https://images.unsplash.com/photo-1589040831563-aa9d07e05ab5?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-      cafe: "url('https://plus.unsplash.com/premium_photo-1664970900025-1e3099ca757a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-      sky: "url('https://images.unsplash.com/photo-1596869628264-2344d70a73ca?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-      space: "url('https://images.unsplash.com/photo-1505506874110-6a7a69069a08?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
+      library: "url('https://images.unsplash.com/photo-1589040831563-aa9d07e05ab5')",
+      cafe: "url('https://plus.unsplash.com/premium_photo-1664970900025-1e3099ca757a')",
+      sky: "url('https://images.unsplash.com/photo-1596869628264-2344d70a73ca')",
+      space: "url('https://images.unsplash.com/photo-1505506874110-6a7a69069a08')"
     };
 
     document.getElementById("themeSelector").addEventListener("change", function () {
@@ -530,8 +527,6 @@
         document.body.style.backgroundImage = "";
       }
     });
-
-
   </script>
 
   <div class="emoji-bar">
@@ -541,8 +536,6 @@
     <button onclick="sendReaction('👏')">👏</button>
     <button onclick="sendReaction('😮')">😮</button>
   </div>
-
-
 </body>
 
 </html>
