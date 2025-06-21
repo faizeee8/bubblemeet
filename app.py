@@ -7,6 +7,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from firebase_setup import initialize_firebase
 import os
+import random
 
 # Load Firebase service account from environment variable
 firebase_creds = json.loads(os.environ['FIREBASE_CREDS_JSON'])
@@ -49,13 +50,17 @@ def create_room():
     room_name = data.get('room_name', 'Untitled Room')
     room_id = str(uuid.uuid4())[:8]
 
-    # Save to Firestore only
+    # 🎯 Pick a random emoji for the room
+    emojis = ["📚", "✏️", "📝", "📖", "💡", "🎓", "🧠", "📊", "🔬", "📎"]
+    emoji = random.choice(emojis)
+
+    # ✅ Save to Firestore with name + emoji
     db.collection('rooms').document(room_id).set({
-        'name': room_name
+        'name': room_name,
+        'emoji': emoji
     })
 
-    return jsonify({'room_id': room_id, 'room_name': room_name})
-
+    return jsonify({'room_id': room_id, 'room_name': room_name, 'emoji': emoji})
 
 
 @app.route('/api/rooms', methods=['GET'])
