@@ -76,11 +76,11 @@ def get_rooms():
 
 @socketio.on('join-room')
 def handle_join(data):
-    join_room(data['roomName'])
+    join_room(data['roomId'])  # ✅ Use room ID!
     emit('user-connected', {
         'peerId': data['peerId'],
         'userName': data['userName']
-    }, room=data['roomName'], include_self=False)
+    }, room=data['roomId'], include_self=False)
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -88,7 +88,7 @@ def handle_disconnect():
 
 @socketio.on('chat-message')
 def handle_chat(data):
-    emit('chat-message', data, room=data['roomName'])
+    emit('chat-message', data, room=data['roomId'])  # <- updated
 
 @socketio.on('send-reaction')
 def handle_reaction(data):

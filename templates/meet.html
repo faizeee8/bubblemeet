@@ -300,7 +300,7 @@
     const socket = io("https://bubblemeet-hr3u.onrender.com/");
     const peer = new Peer();
 
-    const roomName = "{{ room_name }}";
+    const roomId = "{{ room_id }}"; 
     const userName = prompt("Enter your name") || "Anonymous";
 
     const videoContainer = document.getElementById('video-container');
@@ -349,7 +349,7 @@
           });
 
           peer.on('open', id => {
-            socket.emit('join-room', { roomName, peerId: id, userName });
+            socket.emit('join-room', { roomId, peerId: id, userName });
           });
 
           socket.on('chat-message', data => {

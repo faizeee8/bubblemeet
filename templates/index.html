@@ -376,7 +376,7 @@
           const rooms = data.rooms;
           for (const [roomId, roomData] of Object.entries(rooms)) {
             if (roomData.name) {
-              addRoomToList(roomId, roomData.name, roomData.emoji);
+              addRoomToList(roomId, roomData.name, roomData.emoji || getRandomEmoji());
             }
           }
         });
