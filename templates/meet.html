@@ -349,7 +349,7 @@
           });
 
           peer.on('open', id => {
-            socket.emit('join-room', { roomId, peerId: id, userName });
+            socket.emit('join-room', { roomName: "{{ room_id }}", peerId: id, userName });
           });
 
           socket.on('chat-message', data => {
@@ -479,7 +479,7 @@
         div.textContent = `${userName}: ${msg}`;
         messagesContainer.appendChild(div);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        socket.emit('chat-message', { user: userName, message: msg });
+        socket.emit('chat-message', { roomName: "{{ room_id }}", user: userName, message: msg });
         input.value = "";
       }
     }
@@ -489,7 +489,7 @@
     });
 
     function sendReaction(emoji) {
-      socket.emit('send-reaction', { emoji, user: userName });
+      socket.emit('send-reaction', { emoji, user: userName, room: "{{ room_id }}" });
       showFloatingEmoji(emoji);
     }
 
