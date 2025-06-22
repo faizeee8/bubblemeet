@@ -1,8 +1,9 @@
 from gevent import monkey
 monkey.patch_all()
+
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from flask_socketio import SocketIO, join_room, emit
+from flask_socketio import SocketIO, emit, join_room
 import uuid
 import json
 import firebase_admin
@@ -11,17 +12,18 @@ from firebase_setup import initialize_firebase
 import os
 import random
 
-# Load Firebase service account from environment variable
+# ✅ Initialize Flask App
+app = Flask(__name__, template_folder='templates')
+CORS(app)
+
+# ✅ Load Firebase credentials from environment
 firebase_creds = json.loads(os.environ['FIREBASE_CREDS_JSON'])
 cred = credentials.Certificate(firebase_creds)
 firebase_admin.initialize_app(cred)
 initialize_firebase()
 db = firestore.client()
 
-app = Flask(__name__, template_folder='templates')
-CORS(app)
-
-# ✅ Use gevent async_mode explicitly
+# ✅ Initialize SocketIO (after app is created)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
 
 # ---------- ROUTES ----------
@@ -67,7 +69,7 @@ def get_rooms():
 @socketio.on('join-room')
 def handle_join(data):
     print("JOIN-ROOM received:", data)
-    room_id = data['roomId']  # 🔁 roomId instead of roomName
+    room_id = data['roomId']
     join_room(room_id)
     emit('user-connected', {
         'peerId': data['peerId'],
