@@ -16,6 +16,10 @@ import random
 app = Flask(__name__, template_folder='templates')
 CORS(app)
 
+print("Checking FIREBASE_CREDS_JSON...")
+print("Length of env var:", len(os.environ.get('FIREBASE_CREDS_JSON', '')))
+
+
 # ✅ Load Firebase credentials from environment
 firebase_creds = json.loads(os.environ['FIREBASE_CREDS_JSON'])
 cred = credentials.Certificate(firebase_creds)
@@ -91,5 +95,7 @@ def handle_reaction(data):
 # ---------- RUN ----------
 
 if __name__ == '__main__':
+    print("Starting Flask app...")
     port = int(os.environ.get("PORT", 5000))
+    print(f"Bubblemeet running on http://localhost:{port}")
     socketio.run(app, host='0.0.0.0', port=port)
