@@ -21,8 +21,7 @@ print("Length of env var:", len(os.environ.get('FIREBASE_CREDS_JSON', '')))
 
 
 # ✅ Load Firebase credentials from environment
-firebase_creds = json.loads(os.environ['FIREBASE_CREDS_JSON'])
-cred = credentials.Certificate(firebase_creds)
+cred = credentials.Certificate("bubblemeet-e6d83-firebase-adminsdk-fbsvc-a3bb65fa93.json")
 firebase_admin.initialize_app(cred)
 initialize_firebase()
 db = firestore.client()
